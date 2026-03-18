@@ -8,7 +8,13 @@ public class Whiplash : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","MotionWarping",
+			"GameplayTags",
+			"AnimGraphRuntime",
+			"AnimationWarpingRuntime",
+			"Chooser",
+			"PoseSearch",
+			"StructUtils" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
