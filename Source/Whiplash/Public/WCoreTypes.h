@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WhiplashCoreTypes.generated.h"
+#include "WCoreTypes.generated.h"
 
 WHIPLASH_API DECLARE_LOG_CATEGORY_EXTERN(LogWhiplash,Log,All);
 

@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "WhiplashCoreTypes.h"
+#include "WCoreTypes.h"
 #include "GameplayTagContainer.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PoseSearch/PoseSearchTrajectoryLibrary.h"
@@ -12,7 +12,7 @@
 
 
 ////////////////////////////////////////
-#include "WhiplashCharacter.generated.h"
+#include "WCharacter.generated.h"
 ////////////////////////////////////////
 
 class USpringArmComponent;
@@ -20,7 +20,7 @@ class UCameraComponent;
 class UMotionWarpingComponent;
 class UChooserTable;
 UCLASS()
-class WHIPLASH_API AWhiplashCharacter : public ACharacter
+class WHIPLASH_API AWCharacter : public ACharacter
 {
 	GENERATED_BODY()
 	friend class AWhiplashPlayerController;
@@ -101,7 +101,7 @@ protected:
 ///////////////////////////////////////////	
 
 public:
-	AWhiplashCharacter();
+	AWCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
