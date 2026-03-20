@@ -26,6 +26,20 @@ class WHIPLASH_API AWCharacter : public ACharacter
 	friend class AWhiplashPlayerController;
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
+	
+	FTransform DefaultCharacterTransform = FTransform(FRotator(0.0f,-90.0f,0.0f).Quaternion(),
+		FVector(0.0f,0.0f,-89.0f),
+		FVector::OneVector);
+	FTransform DefaultSpringArmTransform = FTransform(FRotator(0.0f,0.0f,0.0f).Quaternion(),FVector(0.0f,0.0f,20.0f),FVector::OneVector);
+	
+	UPROPERTY()
+	TObjectPtr<UCharacterMovementComponent> CMC;
+	UPROPERTY()
+	TObjectPtr<UCapsuleComponent> WCapsuleComponent;
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> MeshComp;
+	
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Character)
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -36,6 +50,8 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
 	bool bPreviousWantsFirstPerson = false;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
+	bool bWantsFirstPerson = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
 	bool bWantsToSprint = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
@@ -141,9 +157,10 @@ public:
 	FRotator FirstPersonNotFallingRotationRate = FRotator(0.0f,-1.0f,0.0f);
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
-	FTraversalCheckResult TraversalCheckResult ;
+	FTraversalCheckResult TraversalResult = {} ;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
 	bool bDoingTraversalAction = false;
+	
 
 	
 	

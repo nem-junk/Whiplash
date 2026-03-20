@@ -21,4 +21,6 @@ class WHIPLASH_API IWPlayerControllerInterface
 
 	
 public:
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category="Input|Action")
+	bool IsFullMovementInput()const;
 };

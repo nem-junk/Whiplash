@@ -15,7 +15,7 @@ if(GEngine) \
 GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(Format, ##__VA_ARGS__)); \
 } \
 }
-
+#define TraceType_Traversal TraceTypeQuery1
 
 UENUM(BlueprintType)
 enum class EAnalogMovementBehavior : uint8

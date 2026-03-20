@@ -73,20 +73,67 @@ public:
 			bHasFrontLedge, bHasBackLedge, bHasBackFloor, ObstacleHeight, ObstacleDepth, BackLedgeHeight, IsValid(ChosenMontage) ? *ChosenMontage->GetName() : TEXT("nullptr"), StartTime, PlayRate);
 	}
 };
+USTRUCT(BlueprintType)
+struct FTraversalChooserParameters
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
+	ETraversalActionType ActionType = ETraversalActionType::None;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
+	EGait Gait = EGait::Walk;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
+	float Speed = 0;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
+	float ObstacleHeight = 0;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
+	float ObstacleDepth = 0;
+};
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class WHIPLASH_API UWTraversalComponent : public UActorComponent
+UINTERFACE(Blueprintable)
+class UTraversalObstacleInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class WHIPLASH_API ITraversalObstacleInterface
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category="Traversal")
+	void GetLedgeTransforms(const FVector& HitLocation,
+		const FVector& ActorLocation, 
+		UPARAM(ref,DisplayName = "TraversalTraceResult") FTraversalCheckResult& TraversalTraceResultOut);
+		
+	
+};
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class WHIPLASH_API UWTraversalComponent : public UActorComponent , public ITraversalObstacleInterface
+{
+	GENERATED_BODY()
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Traversal")
+	TArray<USplineComponent*> Ledges = {}; 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Traversal")
+	TMap<USplineComponent*,USplineComponent*> OppositeLedges = {};
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Traversal")
+	float MinLedgeWidth = 60;
+	
+	UFUNCTION()
+	USplineComponent* FindLedgeClosestToActor (const FVector& ActorLocation) const;
+
 public:	
 	UWTraversalComponent();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	virtual void GetLedgeTransforms_Implementation(const FVector& HitLocation, const FVector& ActorLocation, FTraversalCheckResult& TraversalTraceResultOut) override;
 
-protected:
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable,Category="Traversal")
+	void Initialize(UPARAM(DisplayName = "Ledges") const TArray<USplineComponent*>& NewLedges,UPARAM(DisplayName = "OppositeLedges")const TMap<USplineComponent*,USplineComponent*>& NewOppositeLedges);
 
-public:	
-
+	FORCEINLINE const TArray<USplineComponent*>& GetLedges() const { return Ledges; }
+	FORCEINLINE const TMap<USplineComponent*,USplineComponent*>& GetOppositeLedges() const { return OppositeLedges; }
+	FORCEINLINE const float GetMinLedgeWidth() const {return MinLedgeWidth; } 
 		
 };
