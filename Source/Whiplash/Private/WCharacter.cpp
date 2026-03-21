@@ -369,21 +369,43 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	
 	FChooserEvaluationContext Context = UChooserFunctionLibrary::MakeChooserEvaluationContext();
 	Context.AddStructParam(ChooserParameters);
+	//MakeEvaluateChooser()->wraps the chooser table in an evaluatable form
+	//EvaluateObjectChooserBaseMulti()->runs the chooser with the context given, returns all the montages in this case that pass the conditions as a TArray 
 	TArray<UObject*> AnimationAssets = UChooserFunctionLibrary::EvaluateObjectChooserBaseMulti(Context,UChooserFunctionLibrary::MakeEvaluateChooser(TraversalAnimationChooserTable.LoadSynchronous()),
 		UAnimMontage::StaticClass());
 	
+	/*perform a motion match on all the montages that were chosen by the chooser to find the best result. this match will elect the best montage and the best entry frame(start time ) bases on the distance to the ledge, and the current Characters pose. if for some reason no montage was found (motion matching failed, pherhaps due to an invalid database or isse with the schema ), print a warning and exit the function*/
+	static const FName PoseHistoryName  = TEXT("PoseHistory");
+	FPoseSearchBlueprintResult Result;
+	UPoseSearchLibrary:: MotionMatch(GetMesh()->GetAnimInstance(),AnimationAssets,
+		PoseHistoryName,FPoseSearchContinuingProperties(),FPoseSearchFutureProperties(),Result);
+	TObjectPtr<const UAnimMontage> AnimationMontage = Cast<UAnimMontage>(Result.SelectedAnim);
+	if (!IsValid(AnimationMontage))
+	{
+		UKismetSystemLibrary::PrintString(this,TEXT("FailedToFindMontage"),
+			true,false,FLinearColor::Red,DrawDebugDuration);
+		bOutTraversalCheckFailed = false;
+		bOutMontageSelectionFailed = true;
+		return;
+	}
+	TraversalCheckResult.ChosenMontage = AnimationMontage;
+	TraversalCheckResult.StartTime = Result.SelectedTime;
+	TraversalCheckResult.PlayRate = Result.WantedPlayRate;
 	
+	TraversalResult = TraversalCheckResult;
+	UpdateWrapTargets();
+	PlayAnimationMontage(TraversalResult.ChosenMontage,TraversalResult.PlayRate,TraversalResult.StartTime);
+	bDoingTraversalAction = true;
+	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent,true);
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
+	if (DrawDebugLevel >=1)
+	{
+		UKismetSystemLibrary::PrintString(this,TraversalCheckResult.ToString(),true,false,FLinearColor::Blue,DrawDebugDuration);
+		UKismetSystemLibrary::PrintString(this,UEnum::GetValueAsString(TraversalCheckResult.ActionType),true,false,FLinearColor::Blue,DrawDebugDuration);
+		const FString PerfString = FString::Printf(TEXT("Execution Time: %f seconds"),FPlatformTime::Seconds()-StartTime);
+		UKismetSystemLibrary::PrintString(this,PerfString,true,true,FLinearColor::White,DrawDebugDuration);
+	}
 
 }
 
