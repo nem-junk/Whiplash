@@ -411,16 +411,89 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 
 float AWCharacter::GetTraversalForwardTraceDistance() const
 {
-	return 0.02f;
+	static  const FVector2D RangeA = FVector2D(0,500);
+	static  const FVector2D RangeB = FVector2D(75,350);
+	return FMath::GetMappedRangeValueClamped(RangeA,RangeB,GetActorRotation().Quaternion().UnrotateVector(GetCharacterMovement()->Velocity).X);
+	
 }
 
 void AWCharacter::UpdateWrapTargets() const
 {
-}
+	// warp target Names
+	static const FName FrontLedgeWarpTargetName = TEXT("FrontLedge");
+	static const FName BackLedgeWarpTargetName = TEXT("BackLedge");
+	static const FName BackFloorWarpTargetName = TEXT("BackFloor");
+	static const FName DistanceFromLedgeCurveName = TEXT("Distance_From_Ledge");
+	
+	MotionWarping->AddOrUpdateWarpTargetFromLocationAndRotation(FrontLedgeWarpTargetName,TraversalResult.FrontLedgeLocation,FRotationMatrix::MakeFromX(-TraversalResult.FrontLedgeNormal).Rotator());
+	
+	float AnimatedDistanceFromFrontLedgeToBackLedge = 0;
+	// if action type was a hurdle or a value, we need ti also update the backledge target. if it is not a hurdle or vault,removeit
+	if (TraversalResult.ActionType == ETraversalActionType::Hurdle || TraversalResult.ActionType == ETraversalActionType::Vault)
+	{
+		// Because the traversal animations move at different distances (no fixed metrics), we need to know how far the animation moves in order to warp it properly. Here we cache a curve value at the end of the Back Ledge warp window to determine how far the animation is from the front ledge once the character reaches the back ledge location in the animation.
+		TArray<FMotionWarpingWindowData> MotionWarpingWindowData;
+		UMotionWarpingUtilities::GetMotionWarpingWindowsForWarpTargetFromAnimation(TraversalResult.ChosenMontage,BackLedgeWarpTargetName,MotionWarpingWindowData);
+		if (!MotionWarpingWindowData.IsEmpty())
+		{
+			UAnimationWarpingLibrary::GetCurveValueFromAnimation(TraversalResult.ChosenMontage,DistanceFromLedgeCurveName,MotionWarpingWindowData[0].EndTime,
+				AnimatedDistanceFromFrontLedgeToBackLedge);
+			
+			MotionWarping->AddOrUpdateWarpTargetFromLocationAndRotation(BackLedgeWarpTargetName,TraversalResult.BackLedgeLocation,FRotator::ZeroRotator);
+			
+		}
+		else
+		{
+			MotionWarping->RemoveWarpTarget(BackLedgeWarpTargetName);
+		}
+	}
+	else
+	{
+		MotionWarping->RemoveWarpTarget(BackLedgeWarpTargetName);
+	}
+	// If the action type was a hurdle, we need to also update the BackFloor target. If it is not a hurdle, remove it.
+	if (TraversalResult.ActionType == ETraversalActionType::Hurdle)
+	{
+		// Caches a curve value at the end of the Back Floor warp window to determine how far the animation is from the front ledge once the character touches the ground.
+		TArray<FMotionWarpingWindowData> MotionWarpingWindowData;
+		UMotionWarpingUtilities::GetMotionWarpingWindowsForWarpTargetFromAnimation(TraversalResult.ChosenMontage,
+			BackFloorWarpTargetName,MotionWarpingWindowData);
+		if (!MotionWarpingWindowData.IsEmpty())
+		{
+			float AnimatedDistanceFromFrontLedgeToBackFloor = 0;
+			UAnimationWarpingLibrary::GetCurveValueFromAnimation(TraversalResult.ChosenMontage,DistanceFromLedgeCurveName,MotionWarpingWindowData[0].EndTime,
+				AnimatedDistanceFromFrontLedgeToBackFloor);
+			// Since the animations may land on the floor at different distances (a run hurdle may travel further than a walk or stand hurdle), use the total animated distance away from the back ledge as the X and Y values of the BackFloor warp point. This could technically cause some collision issues if the floor is not flat, or there is an obstacle in the way, therefore having fixed metrics for all traversal animations would be an improvement.
+			const FVector Vector1 = TraversalResult.BackLedgeNormal*
+				FMath::Abs(AnimatedDistanceFromFrontLedgeToBackLedge -AnimatedDistanceFromFrontLedgeToBackFloor);
+			const FVector Vector2 = TraversalResult.BackLedgeLocation + Vector1;
+			MotionWarping->AddOrUpdateWarpTargetFromLocationAndRotation(BackFloorWarpTargetName,
+				FVector(Vector2.X,Vector2.Y,TraversalResult.BackFloorLocation.Z),
+				FRotator::ZeroRotator);
+		}
+		else
+		{
+			MotionWarping->RemoveWarpTarget(BackFloorWarpTargetName);
+		}
+	}
+	else
+	{
+		MotionWarping->RemoveWarpTarget(BackFloorWarpTargetName);
+	}
+	
+	
+	
+	
+	
+}	
 
 
 void AWCharacter::OnAnimationMontageCompletedOrInterrupted()
 {
+	bDoingTraversalAction = false;
+	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent,false);
+	GetCharacterMovement()->SetMovementMode(TraversalResult.ActionType == ETraversalActionType::Vault ? MOVE_Falling : MOVE_Walking);
+	
 }
 
 void AWCharacter::PlayAudioEvent_Implementation(const FGameplayTag& Value, float VolumeMultiplier,
