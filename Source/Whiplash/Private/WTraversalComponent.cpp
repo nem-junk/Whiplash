@@ -44,6 +44,28 @@ USplineComponent* UWTraversalComponent::FindLedgeClosestToActor(const FVector& A
 void UWTraversalComponent::GetLedgeTransforms_Implementation(const FVector& HitLocation, const FVector& ActorLocation,
 	FTraversalCheckResult& TraversalTraceResultOut)
 {
-	const
+	const USplineComponent* ClosestLedge = FindLedgeClosestToActor(ActorLocation);
+	if (!IsValid(ClosestLedge) || MinLedgeWidth){TraversalTraceResultOut.bHasFrontLedge=false;return;}
+	
+	const float HalfMinLedgeWidth = MinLedgeWidth / 2;
+	const FVector ClosestHitLocation = ClosestLedge->FindLocationClosestToWorldLocation(HitLocation,ESplineCoordinateSpace::Local);
+	const float ClosestHitDistance = 
+		FMath::Clamp(ClosestLedge->GetDistanceAlongSplineAtLocation(ClosestHitLocation,ESplineCoordinateSpace::Local),
+			HalfMinLedgeWidth,ClosestLedge->GetSplineLength()-HalfMinLedgeWidth);
+	
+	const FTransform FrontLedgeTransform = ClosestLedge->GetTransformAtDistanceAlongSpline(ClosestHitDistance,ESplineCoordinateSpace::World);
+	TraversalTraceResultOut.FrontLedgeLocation = FrontLedgeTransform.GetLocation();
+	TraversalTraceResultOut.FrontLedgeNormal = FrontLedgeTransform.GetRotation().GetUpVector();
+	TraversalTraceResultOut.bHasFrontLedge = true;
+	if (!OppositeLedges.Contains(ClosestLedge))
+	{
+		TraversalTraceResultOut.bHasBackLedge = false;
+	}
+	const USplineComponent* OppositeLedge = *OppositeLedges.Find(ClosestLedge);
+	const FTransform BackLedgeTransform = 
+		OppositeLedge->FindTransformClosestToWorldLocation(TraversalTraceResultOut.FrontLedgeLocation,ESplineCoordinateSpace::World);
+	TraversalTraceResultOut.BackLedgeLocation = BackLedgeTransform.GetLocation();
+	TraversalTraceResultOut.BackLedgeNormal = BackLedgeTransform.GetRotation().GetUpVector();
+	TraversalTraceResultOut.bHasBackLedge = true;
 	
 }

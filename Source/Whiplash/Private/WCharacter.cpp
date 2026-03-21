@@ -269,6 +269,118 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 				SDPG_World,1);
 		}
 	}
+	const FVector HasRoomCheckFrontLedgeLocation = TraversalCheckResult.FrontLedgeLocation+
+		TraversalCheckResult.FrontLedgeNormal*(CapsuleRadius + 2)+
+			FVector::ZAxisVector*(CapsuleHalfHeight+2);
+	
+	UKismetSystemLibrary::CapsuleTraceSingle(this,ActorLocation,HasRoomCheckFrontLedgeLocation,CapsuleRadius,CapsuleHalfHeight,
+		TraceType_Traversal,false,{},DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
+	if (Hit.bBlockingHit||Hit.bStartPenetrating)
+	{
+		TraversalCheckResult.bHasFrontLedge = false;
+		bOutTraversalCheckFailed = true;
+		bOutMontageSelectionFailed = false;
+		return;
+	}
+	TraversalCheckResult.ObstacleHeight = FMath::Abs((ActorLocation - FVector::ZAxisVector*CapsuleHalfHeight-TraversalCheckResult.FrontLedgeLocation).Z);
+	
+	const FVector HasRoomCheckBackLedgeLocation = TraversalCheckResult.BackLedgeLocation+ 
+		TraversalCheckResult.BackLedgeNormal*(CapsuleRadius + 2)+ FVector::ZAxisVector*(CapsuleHalfHeight+2);
+	if (UKismetSystemLibrary::CapsuleTraceSingle(this,HasRoomCheckFrontLedgeLocation,HasRoomCheckBackLedgeLocation,
+		CapsuleRadius,CapsuleHalfHeight,TraceType_Traversal,false,{},DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration))
+	{
+		//found something blocking 
+		TraversalCheckResult.ObstacleDepth = (Hit.ImpactPoint - TraversalCheckResult.FrontLedgeLocation).Size2D();
+		TraversalCheckResult.bHasBackLedge = false;
+	}
+	else
+	{
+		TraversalCheckResult.ObstacleDepth = (TraversalCheckResult.FrontLedgeLocation - TraversalCheckResult.BackLedgeLocation).Size2D();
+		
+		const FVector EndTraceLocation = TraversalCheckResult.BackLedgeLocation+TraversalCheckResult.BackLedgeNormal*(CapsuleRadius + 2)-
+			FVector::ZAxisVector * (TraversalCheckResult.ObstacleHeight - CapsuleHalfHeight+50);
+		UKismetSystemLibrary::CapsuleTraceSingle(this,HasRoomCheckBackLedgeLocation,EndTraceLocation,CapsuleRadius,CapsuleHalfHeight,TraceType_Traversal,false,{},
+			DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
+		
+		if (Hit.bBlockingHit)
+		{
+			TraversalCheckResult.bHasBackFloor = true;
+			TraversalCheckResult.BackFloorLocation = Hit.ImpactPoint;
+			TraversalCheckResult.BackLedgeHeight = FMath::Abs((Hit.ImpactPoint-TraversalCheckResult.BackLedgeLocation).Z);
+		}
+		else
+		{
+			TraversalCheckResult.bHasBackFloor = false;
+		}
+	}
+	// check what type of traversal action to do 
+	
+	if (TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && !TraversalCheckResult.bHasBackFloor && 
+		UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,125) && TraversalCheckResult.ObstacleDepth < 59)
+	{
+		TraversalCheckResult.ActionType = ETraversalActionType::Vault;
+	}
+	else if ( TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && TraversalCheckResult.bHasBackFloor && 
+		UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,125) && TraversalCheckResult.ObstacleDepth < 59 && 
+		TraversalCheckResult.BackLedgeHeight > 50)
+	{ 
+		TraversalCheckResult.ActionType = ETraversalActionType::Hurdle;
+	}
+	else if ( TraversalCheckResult.bHasFrontLedge && UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,275) && 
+		TraversalCheckResult.ObstacleDepth >= 59)
+	{
+		TraversalCheckResult.ActionType = ETraversalActionType::Mantle;
+	}
+	else
+	{
+		TraversalCheckResult.ActionType = ETraversalActionType::None;
+	}
+	if (TraversalCheckResult.ActionType == ETraversalActionType::None)
+	{
+		bOutTraversalCheckFailed = true;
+		bOutMontageSelectionFailed = false;
+		return;
+	}
+	// to AnimationBP 
+	IWInteractionTInterface* InteractableObject = Cast<IWInteractionTInterface>(GetMesh()->GetAnimInstance());
+	if (InteractableObject == nullptr && !GetMesh()->GetAnimInstance()->Implements<UWInteractionTInterface>())
+	{
+		bOutTraversalCheckFailed = true;
+		bOutMontageSelectionFailed = false;
+		return;
+	}
+	const FTransform InteractionTransform = 
+		FTransform(FRotationMatrix::MakeFromZ(TraversalCheckResult.FrontLedgeNormal).ToQuat(),TraversalCheckResult.FrontLedgeLocation,FVector::OneVector);
+	
+	if (InteractableObject)
+	{
+		InteractableObject->Execute_SetInteractionTransform(GetMesh()->GetAnimInstance(), InteractionTransform);
+	}
+	/* if the interactable object is not valid call interface function directly here*/
+	
+	FTraversalChooserParameters ChooserParameters;
+	ChooserParameters.ActionType = TraversalCheckResult.ActionType;
+	ChooserParameters.Gait = Gait;
+	ChooserParameters.Speed = GetCharacterMovement()->Velocity.Size2D();
+	ChooserParameters.ObstacleHeight = TraversalCheckResult.ObstacleHeight;
+	ChooserParameters.ObstacleDepth = TraversalCheckResult.ObstacleDepth;
+	
+	FChooserEvaluationContext Context = UChooserFunctionLibrary::MakeChooserEvaluationContext();
+	Context.AddStructParam(ChooserParameters);
+	TArray<UObject*> AnimationAssets = UChooserFunctionLibrary::EvaluateObjectChooserBaseMulti(Context,UChooserFunctionLibrary::MakeEvaluateChooser(TraversalAnimationChooserTable.LoadSynchronous()),
+		UAnimMontage::StaticClass());
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 
