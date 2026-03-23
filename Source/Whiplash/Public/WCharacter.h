@@ -23,7 +23,7 @@ UCLASS()
 class WHIPLASH_API AWCharacter : public ACharacter
 {
 	GENERATED_BODY()
-	friend class AWhiplashPlayerController;
+	friend class AWPlayerController;
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
