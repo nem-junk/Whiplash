@@ -33,11 +33,11 @@ protected:
 		FVector::OneVector);
 	FTransform DefaultSpringArmTransform = FTransform(FRotator(0.0f,0.0f,0.0f).Quaternion(),FVector(0.0f,0.0f,20.0f),FVector::OneVector);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCapsuleComponent> WCapsuleComponent;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
 
 
