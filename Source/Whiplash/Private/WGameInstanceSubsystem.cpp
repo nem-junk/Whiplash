@@ -2,6 +2,7 @@
 
 void UWGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+	Super::Initialize(Collection);
 	REGISTER_CONSOLE_VARIABLE_CHANGE("DDCvar.DrawMeshTrajectory", DrawMeshTrajectory);
 	REGISTER_CONSOLE_VARIABLE_CHANGE("DDCvar.MMDrawQuery", MMDrawQuery);
 	REGISTER_CONSOLE_VARIABLE_CHANGE("DDCvar.MMDrawMatch", MMDrawMatch);
@@ -14,5 +15,5 @@ void UWGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	REGISTER_CONSOLE_VARIABLE_CHANGE("DDCvar.DrawVisLogShapesForFoleySounds", DrawVisLogShapesForFoleySounds);
 	REGISTER_CONSOLE_VARIABLE_CHANGE("a.animnode.offsetrootbone.enable", OffsetRootBoneEnable);
 
-	Super::Initialize(Collection);
+	
 }
