@@ -1,5 +1,8 @@
 
 #include "WTraversalComponent.h"
+
+#include <Programs/UnrealBuildAccelerator/Core/Public/UbaBase.h>
+
 #include "Components/SplineComponent.h"
 
 
@@ -45,7 +48,11 @@ void UWTraversalComponent::GetLedgeTransforms_Implementation(const FVector& HitL
 	FTraversalCheckResult& TraversalTraceResultOut)
 {
 	const USplineComponent* ClosestLedge = FindLedgeClosestToActor(ActorLocation);
-	if (!IsValid(ClosestLedge) || MinLedgeWidth){TraversalTraceResultOut.bHasFrontLedge=false;return;}
+	if (!IsValid(ClosestLedge) || ClosestLedge->GetSplineLength() < MinLedgeWidth)
+	{	
+		TraversalTraceResultOut.bHasFrontLedge = false;
+		return;
+	}
 	
 	const float HalfMinLedgeWidth = MinLedgeWidth / 2;
 	const FVector ClosestHitLocation = ClosestLedge->FindLocationClosestToWorldLocation(HitLocation,ESplineCoordinateSpace::Local);
@@ -60,6 +67,7 @@ void UWTraversalComponent::GetLedgeTransforms_Implementation(const FVector& HitL
 	if (!OppositeLedges.Contains(ClosestLedge))
 	{
 		TraversalTraceResultOut.bHasBackLedge = false;
+		return;
 	}
 	const USplineComponent* OppositeLedge = *OppositeLedges.Find(ClosestLedge);
 	const FTransform BackLedgeTransform = 

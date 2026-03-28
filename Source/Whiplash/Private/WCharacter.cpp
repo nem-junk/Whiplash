@@ -17,12 +17,12 @@
 AWCharacter::AWCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	bUseControllerRotationYaw = false;
 	MeshComp = GetMesh();
 	MeshComp->SetRelativeTransform(DefaultCharacterTransform);
 	MeshComp->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
-	
+
 	CMC = GetCharacterMovement();
 	CMC->MaxAcceleration = 800.f;
 	CMC->BrakingFrictionFactor = 1.0f;
@@ -37,13 +37,13 @@ AWCharacter::AWCharacter()
 	CMC->AirControl = 0.25f;
 	CMC->RotationRate = FRotator(0.0f, -1.0f, 0.0f);
 	CMC->GetNavAgentPropertiesRef().bCanCrouch = true;
-	
+
 	WCapsuleComponent = GetCapsuleComponent();
 	WCapsuleComponent->SetCapsuleHalfHeight(86.0);
 	WCapsuleComponent->SetCapsuleRadius(30.0);
 	WCapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	WCapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
-	
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetRelativeTransform(DefaultSpringArmTransform);
 	SpringArm->ProbeSize = 0.0f;
@@ -51,24 +51,24 @@ AWCharacter::AWCharacter()
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->CameraLagMaxDistance = 200.0f;
 	SpringArm->SetupAttachment(RootComponent);
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-	
+
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
-	
+
 	CameraStyleFirstPerson.SpringArmLength = 0.0f;
 	CameraStyleFirstPerson.SocketOffset = FVector(11.0f,0.0f,9.0f);
 	CameraStyleFirstPerson.TranslationLagSpeed = 50.0f;
 	CameraStyleFirstPerson.FieldOfView=90.0f;
 	CameraStyleFirstPerson.TransitionSpeed=5.0f;
-	
+
 	CameraStyleThirdPersonFar.SpringArmLength = 300.0f;
 	CameraStyleThirdPersonFar.SocketOffset = FVector(0.0f,0.0f,20.0f);
 	CameraStyleThirdPersonFar.TranslationLagSpeed = 6;
 	CameraStyleThirdPersonFar.FieldOfView = 90.0f;
 	CameraStyleThirdPersonFar.TransitionSpeed = 2;
-	
+
 	CameraStyleThirdPersonClose.SpringArmLength = 200.0f;
 	CameraStyleThirdPersonClose.SocketOffset = FVector(0.0f,50.0f,30.0f);
 	CameraStyleThirdPersonClose.TranslationLagSpeed = 15.0f;
@@ -78,12 +78,12 @@ AWCharacter::AWCharacter()
 void AWCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+
 }
 void AWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 void AWCharacter::Tick(float DeltaTime)
 {
@@ -110,7 +110,7 @@ void AWCharacter::OnJumped_Implementation()
 	PlayAudioEvent(JumpEventAudioGameplayTag,FMath::GetMappedRangeValueClamped(RangeA,
 		RangeB,
 		GetCharacterMovement()->Velocity.Size2D()),1);
-	
+
 }
 
 void AWCharacter::Landed(const FHitResult& Hit)
@@ -154,7 +154,7 @@ void AWCharacter::UpdateCamera(bool bInterpolate)
 		bWantsToStrafe ? (bWantsToAim ? CameraStyleThirdPersonAim : CameraStyleThirdPersonClose):CameraStyleThirdPersonFar;
 	const float TranslationLagSpeed = bInterpolate ? TargetCameraParameters.TranslationLagSpeed : -1;
 	const float TransitionSpeed = bInterpolate ? TargetCameraParameters.TransitionSpeed : -1;
-	
+
 	Camera->SetFieldOfView(FMath::FInterpTo(Camera->FieldOfView,TargetCameraParameters.FieldOfView,
 		GetWorld()->DeltaTimeSeconds,TransitionSpeed));
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength,TargetCameraParameters.SpringArmLength,
@@ -189,7 +189,7 @@ EGait AWCharacter::GetDesiredGait() const
 	bool bFullMovementInput = false;
 	if (IsValid(Controller))
 	{
-		if (const IWPlayerControllerInterface* ControllerInterface = 
+		if (const IWPlayerControllerInterface* ControllerInterface =
 			Cast<IWPlayerControllerInterface>(Controller))
 		{
 			bFullMovementInput = ControllerInterface->Execute_IsFullMovementInput(Controller);
@@ -206,7 +206,7 @@ float AWCharacter::CalculateMaxSpeed() const
 			StrafeSpeedMapCurve.LoadSynchronous()->GetFloatValue(
 			FMath::Abs(UKismetAnimationLibrary::CalculateDirection(CMC->Velocity,GetActorRotation())));
 		const bool bStrafe = StrafeSpeedMap < 1.0f;
-		const FVector& Speeds = CMC->IsCrouching() ? CrouchSpeeds : 
+		const FVector& Speeds = CMC->IsCrouching() ? CrouchSpeeds :
 		Gait == EGait::Walk ? WalkSpeeds :
 		Gait == EGait::Run ? RunSpeeds :
 		Gait == EGait::Sprint ? SprintSpeeds :
@@ -214,7 +214,7 @@ float AWCharacter::CalculateMaxSpeed() const
 		static const FVector2D RangeA1 = FVector2D(0,1);
 		static const FVector2D RangeA2 = FVector2D(1,2);
 		return FMath::GetMappedRangeValueClamped(bStrafe ? RangeA1 : RangeA2,FVector2D(bStrafe ? Speeds.X :Speeds.Y, bStrafe ? Speeds.Y : Speeds.Z),StrafeSpeedMap);
- 		
+
 	}
 	return INDEX_NONE ;
 }
@@ -223,13 +223,13 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	bool& bOutMontageSelectionFailed)
 {
 	/* cache imp. values for use later in func */
-	
+
 	const double StartTime = FPlatformTime::Seconds();/*only for debug*/
 	const FVector& ActorLocation = GetActorLocation();
 	const FVector& ActorForwardVector = GetActorForwardVector();
 	const float&   CapsuleRadius = GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const float&   CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	
+
 	static const FString DrawDebugLevelConsoleVariableName = TEXT("DDCvar.Traversal.DrawDebugLevel");
 	const int32& DrawDebugLevel = UKismetSystemLibrary::GetConsoleVariableIntValue(DrawDebugLevelConsoleVariableName);
 	static const FString DrawDebugDurationConsoleVariableName = TEXT("DDCvar.Traversal.DrawDebugDuration");
@@ -237,24 +237,44 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	FTraversalCheckResult TraversalCheckResult;
 	///////////////////////////////////////////
 	/* find trace from actor location to find the Traversal Obstacle */
-	
+/////////////////////////////1st Trace
 	FHitResult Hit;
 	UKismetSystemLibrary::CapsuleTraceSingle(this,
 		ActorLocation,(ActorLocation+ActorForwardVector * TraceForwardDistance),30,60,
 		TraceType_Traversal,false,{},
-		DrawDebugLevel >=2 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,Hit,true,
+		EDrawDebugTrace::ForDuration,
+		Hit,true,
 		FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
 	
-	if (!Hit.bBlockingHit || (!Hit.GetActor() && !Hit.GetActor()->Implements<UTraversalObstacleInterface>() ))
+	ITraversalObstacleInterface* Obstacle = Cast<ITraversalObstacleInterface>(Hit.GetActor());
+	
+	if (!Hit.bBlockingHit || !Hit.GetActor())
 	{
 		bOutTraversalCheckFailed = true;
 		bOutMontageSelectionFailed = false;
+		
 		return;
 	}
-	ITraversalObstacleInterface* Obstacle = Cast<ITraversalObstacleInterface>(Hit.GetActor());
+	UWTraversalComponent*TraversalComponent = Hit.GetActor()->FindComponentByClass<UWTraversalComponent>();
+	if (!TraversalComponent)
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("TC is Null"));
+		bOutTraversalCheckFailed = true;
+		bOutMontageSelectionFailed = false;
+		return;
+		
+	}
+	
+	ITraversalObstacleInterface::Execute_GetLedgeTransforms(TraversalComponent,Hit.ImpactPoint,ActorLocation,TraversalCheckResult);
+	
 	if (Obstacle)
 	{
 		Obstacle->Execute_GetLedgeTransforms(Hit.GetActor(),Hit.ImpactPoint,ActorLocation,TraversalCheckResult);
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("ObstacleExecutedGetLedgeTransform"));
+	}
+	if (Obstacle == nullptr)
+	{
+		//WHIPLASH_LOG(LogWhiplash,Error,TEXT("obstacle is null IG"));
 	}
 	if (DrawDebugLevel >= 1 )
 	{
@@ -272,38 +292,44 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	const FVector HasRoomCheckFrontLedgeLocation = TraversalCheckResult.FrontLedgeLocation+
 		TraversalCheckResult.FrontLedgeNormal*(CapsuleRadius + 2)+
 			FVector::ZAxisVector*(CapsuleHalfHeight+2);
-	
+/////////////////////////2nd Trace 
 	UKismetSystemLibrary::CapsuleTraceSingle(this,ActorLocation,HasRoomCheckFrontLedgeLocation,CapsuleRadius,CapsuleHalfHeight,
-		TraceType_Traversal,false,{},DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		TraceType_Traversal,false,{},
+		EDrawDebugTrace::ForDuration,
 		Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
 	if (Hit.bBlockingHit||Hit.bStartPenetrating)
 	{
 		TraversalCheckResult.bHasFrontLedge = false;
 		bOutTraversalCheckFailed = true;
 		bOutMontageSelectionFailed = false;
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("Second Trace failed I Guess"));
 		return;
 	}
 	TraversalCheckResult.ObstacleHeight = FMath::Abs((ActorLocation - FVector::ZAxisVector*CapsuleHalfHeight-TraversalCheckResult.FrontLedgeLocation).Z);
-	
-	const FVector HasRoomCheckBackLedgeLocation = TraversalCheckResult.BackLedgeLocation+ 
+
+	const FVector HasRoomCheckBackLedgeLocation = TraversalCheckResult.BackLedgeLocation+
 		TraversalCheckResult.BackLedgeNormal*(CapsuleRadius + 2)+ FVector::ZAxisVector*(CapsuleHalfHeight+2);
+	//////////////3rd Trace
 	if (UKismetSystemLibrary::CapsuleTraceSingle(this,HasRoomCheckFrontLedgeLocation,HasRoomCheckBackLedgeLocation,
-		CapsuleRadius,CapsuleHalfHeight,TraceType_Traversal,false,{},DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		CapsuleRadius,CapsuleHalfHeight,TraceType_Traversal,false,{},
+		EDrawDebugTrace::ForDuration,
 		Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration))
 	{
-		//found something blocking 
+		//found something blocking
 		TraversalCheckResult.ObstacleDepth = (Hit.ImpactPoint - TraversalCheckResult.FrontLedgeLocation).Size2D();
 		TraversalCheckResult.bHasBackLedge = false;
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("3rd Trace found something First Block"));
 	}
 	else
 	{
 		TraversalCheckResult.ObstacleDepth = (TraversalCheckResult.FrontLedgeLocation - TraversalCheckResult.BackLedgeLocation).Size2D();
-		
+
 		const FVector EndTraceLocation = TraversalCheckResult.BackLedgeLocation+TraversalCheckResult.BackLedgeNormal*(CapsuleRadius + 2)-
 			FVector::ZAxisVector * (TraversalCheckResult.ObstacleHeight - CapsuleHalfHeight+50);
 		UKismetSystemLibrary::CapsuleTraceSingle(this,HasRoomCheckBackLedgeLocation,EndTraceLocation,CapsuleRadius,CapsuleHalfHeight,TraceType_Traversal,false,{},
-			DrawDebugLevel>=3 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
-		
+			EDrawDebugTrace::ForDuration,
+			Hit,true,FLinearColor::Black,FLinearColor::White,DrawDebugDuration);
+
 		if (Hit.bBlockingHit)
 		{
 			TraversalCheckResult.bHasBackFloor = true;
@@ -315,20 +341,20 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 			TraversalCheckResult.bHasBackFloor = false;
 		}
 	}
-	// check what type of traversal action to do 
-	
-	if (TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && !TraversalCheckResult.bHasBackFloor && 
+	// check what type of traversal action to do
+
+	if (TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && !TraversalCheckResult.bHasBackFloor &&
 		UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,125) && TraversalCheckResult.ObstacleDepth < 59)
 	{
 		TraversalCheckResult.ActionType = ETraversalActionType::Vault;
 	}
-	else if ( TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && TraversalCheckResult.bHasBackFloor && 
-		UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,125) && TraversalCheckResult.ObstacleDepth < 59 && 
+	else if ( TraversalCheckResult.bHasFrontLedge && TraversalCheckResult.bHasBackLedge && TraversalCheckResult.bHasBackFloor &&
+		UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,125) && TraversalCheckResult.ObstacleDepth < 59 &&
 		TraversalCheckResult.BackLedgeHeight > 50)
-	{ 
+	{
 		TraversalCheckResult.ActionType = ETraversalActionType::Hurdle;
 	}
-	else if ( TraversalCheckResult.bHasFrontLedge && UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,275) && 
+	else if ( TraversalCheckResult.bHasFrontLedge && UKismetMathLibrary::InRange_FloatFloat(TraversalCheckResult.ObstacleHeight,50,275) &&
 		TraversalCheckResult.ObstacleDepth >= 59)
 	{
 		TraversalCheckResult.ActionType = ETraversalActionType::Mantle;
@@ -343,7 +369,7 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 		bOutMontageSelectionFailed = false;
 		return;
 	}
-	// to AnimationBP 
+	// to AnimationBP
 	IWInteractionTInterface* InteractableObject = Cast<IWInteractionTInterface>(GetMesh()->GetAnimInstance());
 	if (InteractableObject == nullptr && !GetMesh()->GetAnimInstance()->Implements<UWInteractionTInterface>())
 	{
@@ -351,29 +377,29 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 		bOutMontageSelectionFailed = false;
 		return;
 	}
-	const FTransform InteractionTransform = 
+	const FTransform InteractionTransform =
 		FTransform(FRotationMatrix::MakeFromZ(TraversalCheckResult.FrontLedgeNormal).ToQuat(),TraversalCheckResult.FrontLedgeLocation,FVector::OneVector);
-	
+
 	if (InteractableObject)
 	{
 		InteractableObject->Execute_SetInteractionTransform(GetMesh()->GetAnimInstance(), InteractionTransform);
 	}
 	/* if the interactable object is not valid call interface function directly here*/
-	
+
 	FTraversalChooserParameters ChooserParameters;
 	ChooserParameters.ActionType = TraversalCheckResult.ActionType;
 	ChooserParameters.Gait = Gait;
 	ChooserParameters.Speed = GetCharacterMovement()->Velocity.Size2D();
 	ChooserParameters.ObstacleHeight = TraversalCheckResult.ObstacleHeight;
 	ChooserParameters.ObstacleDepth = TraversalCheckResult.ObstacleDepth;
-	
+
 	FChooserEvaluationContext Context = UChooserFunctionLibrary::MakeChooserEvaluationContext();
 	Context.AddStructParam(ChooserParameters);
 	//MakeEvaluateChooser()->wraps the chooser table in an evaluatable form
-	//EvaluateObjectChooserBaseMulti()->runs the chooser with the context given, returns all the montages in this case that pass the conditions as a TArray 
+	//EvaluateObjectChooserBaseMulti()->runs the chooser with the context given, returns all the montages in this case that pass the conditions as a TArray
 	TArray<UObject*> AnimationAssets = UChooserFunctionLibrary::EvaluateObjectChooserBaseMulti(Context,UChooserFunctionLibrary::MakeEvaluateChooser(TraversalAnimationChooserTable.LoadSynchronous()),
 		UAnimMontage::StaticClass());
-	
+
 	/*perform a motion match on all the montages that were chosen by the chooser to find the best result. this match will elect the best montage and the best entry frame(start time ) bases on the distance to the ledge, and the current Characters pose. if for some reason no montage was found (motion matching failed, pherhaps due to an invalid database or isse with the schema ), print a warning and exit the function*/
 	static const FName PoseHistoryName  = TEXT("PoseHistory");
 	FPoseSearchBlueprintResult Result;
@@ -391,14 +417,14 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	TraversalCheckResult.ChosenMontage = AnimationMontage;
 	TraversalCheckResult.StartTime = Result.SelectedTime;
 	TraversalCheckResult.PlayRate = Result.WantedPlayRate;
-	
+
 	TraversalResult = TraversalCheckResult;
 	UpdateWrapTargets();
 	PlayAnimationMontage(TraversalResult.ChosenMontage,TraversalResult.PlayRate,TraversalResult.StartTime);
 	bDoingTraversalAction = true;
 	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent,true);
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	
+
 	if (DrawDebugLevel >=1)
 	{
 		UKismetSystemLibrary::PrintString(this,TraversalCheckResult.ToString(),true,false,FLinearColor::Blue,DrawDebugDuration);
@@ -414,7 +440,7 @@ float AWCharacter::GetTraversalForwardTraceDistance() const
 	static  const FVector2D RangeA = FVector2D(0,500);
 	static  const FVector2D RangeB = FVector2D(75,350);
 	return FMath::GetMappedRangeValueClamped(RangeA,RangeB,GetActorRotation().Quaternion().UnrotateVector(GetCharacterMovement()->Velocity).X);
-	
+
 }
 
 void AWCharacter::UpdateWrapTargets() const
@@ -424,9 +450,9 @@ void AWCharacter::UpdateWrapTargets() const
 	static const FName BackLedgeWarpTargetName = TEXT("BackLedge");
 	static const FName BackFloorWarpTargetName = TEXT("BackFloor");
 	static const FName DistanceFromLedgeCurveName = TEXT("Distance_From_Ledge");
-	
+
 	MotionWarping->AddOrUpdateWarpTargetFromLocationAndRotation(FrontLedgeWarpTargetName,TraversalResult.FrontLedgeLocation,FRotationMatrix::MakeFromX(-TraversalResult.FrontLedgeNormal).Rotator());
-	
+
 	float AnimatedDistanceFromFrontLedgeToBackLedge = 0;
 	// if action type was a hurdle or a value, we need ti also update the backledge target. if it is not a hurdle or vault,removeit
 	if (TraversalResult.ActionType == ETraversalActionType::Hurdle || TraversalResult.ActionType == ETraversalActionType::Vault)
@@ -438,9 +464,9 @@ void AWCharacter::UpdateWrapTargets() const
 		{
 			UAnimationWarpingLibrary::GetCurveValueFromAnimation(TraversalResult.ChosenMontage,DistanceFromLedgeCurveName,MotionWarpingWindowData[0].EndTime,
 				AnimatedDistanceFromFrontLedgeToBackLedge);
-			
+
 			MotionWarping->AddOrUpdateWarpTargetFromLocationAndRotation(BackLedgeWarpTargetName,TraversalResult.BackLedgeLocation,FRotator::ZeroRotator);
-			
+
 		}
 		else
 		{
@@ -480,12 +506,12 @@ void AWCharacter::UpdateWrapTargets() const
 	{
 		MotionWarping->RemoveWarpTarget(BackFloorWarpTargetName);
 	}
-	
-	
-	
-	
-	
-}	
+
+
+
+
+
+}
 
 
 void AWCharacter::OnAnimationMontageCompletedOrInterrupted()
@@ -493,7 +519,7 @@ void AWCharacter::OnAnimationMontageCompletedOrInterrupted()
 	bDoingTraversalAction = false;
 	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent,false);
 	GetCharacterMovement()->SetMovementMode(TraversalResult.ActionType == ETraversalActionType::Vault ? MOVE_Falling : MOVE_Walking);
-	
+
 }
 
 void AWCharacter::PlayAudioEvent_Implementation(const FGameplayTag& Value, float VolumeMultiplier,

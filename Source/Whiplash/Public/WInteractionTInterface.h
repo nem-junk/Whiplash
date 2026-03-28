@@ -37,7 +37,7 @@ class WHIPLASH_API UInteractionTInterfaceBFL : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable,Category="BFL|Traversal")
 	static UPARAM(DisplayName = "Success") bool SetInteractionTransform(UObject*InteractionTransformObject,const FTransform& InteractionTransform);
-	UFUNCTION(BlueprintCallable,Category="BFL|Traversal")
+	UFUNCTION(BlueprintCallable,Category="BFL|Traversal", meta = (BlueprintThreadSafe))
 	static UPARAM (DisplayName = "Success") bool GetInteractionTransform(UObject* InteractionTransformObject,UPARAM(DisplayName="InteractionTransform")FTransform& OutInteractionTransform);
 	
 };
