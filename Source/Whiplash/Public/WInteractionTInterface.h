@@ -14,7 +14,7 @@ class UWInteractionTInterface : public UInterface
 };
 
 /**
- * 
+ *
  */
 class WHIPLASH_API IWInteractionTInterface
 {
@@ -26,10 +26,10 @@ public:
 	void SetInteractionTransform(const FTransform& InteractionTransform );
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category="Interface|Traversal")
 	void GetInteractionTransform (FTransform& OutInteractionTransform ) const;
-	
+
 };
 
-UCLASS(meta = (BlueprinThreadSafe))
+UCLASS(meta = (BlueprintThreadSafe))
 class WHIPLASH_API UInteractionTInterfaceBFL : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
@@ -37,7 +37,7 @@ class WHIPLASH_API UInteractionTInterfaceBFL : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable,Category="BFL|Traversal")
 	static UPARAM(DisplayName = "Success") bool SetInteractionTransform(UObject*InteractionTransformObject,const FTransform& InteractionTransform);
-	UFUNCTION(BlueprintCallable,Category="BFL|Traversal", meta = (BlueprintThreadSafe))
+	UFUNCTION(BlueprintCallable,Category="BFL|Traversal")
 	static UPARAM (DisplayName = "Success") bool GetInteractionTransform(UObject* InteractionTransformObject,UPARAM(DisplayName="InteractionTransform")FTransform& OutInteractionTransform);
-	
+
 };
