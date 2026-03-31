@@ -19,6 +19,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UMotionWarpingComponent;
 class UChooserTable;
+class UWTagComponent;
 UCLASS()
 class WHIPLASH_API AWCharacter : public ACharacter
 {
@@ -32,7 +33,10 @@ protected:
 		FVector(0.0f,0.0f,-89.0f),
 		FVector::OneVector);
 	FTransform DefaultSpringArmTransform = FTransform(FRotator(0.0f,0.0f,0.0f).Quaternion(),FVector(0.0f,0.0f,20.0f),FVector::OneVector);
-
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Tag")
+	TObjectPtr<UWTagComponent> TagComponent;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

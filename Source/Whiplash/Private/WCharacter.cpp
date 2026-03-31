@@ -13,10 +13,16 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "PoseSearch/PoseSearchLibrary.h"
 #include "WInteractionTInterface.h"
+#include "Tags/WGameplayTags.h"
+#include "Tags/WTagComponent.h"
 
 AWCharacter::AWCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
+	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent");
 
 	bUseControllerRotationYaw = false;
 	MeshComp = GetMesh();
@@ -44,7 +50,7 @@ AWCharacter::AWCharacter()
 	WCapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	WCapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
 
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	
 	SpringArm->SetRelativeTransform(DefaultSpringArmTransform);
 	SpringArm->ProbeSize = 0.0f;
 	SpringArm->bUsePawnControlRotation = true;
@@ -52,10 +58,10 @@ AWCharacter::AWCharacter()
 	SpringArm->CameraLagMaxDistance = 200.0f;
 	SpringArm->SetupAttachment(RootComponent);
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	
 	Camera->SetupAttachment(SpringArm);
 
-	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
+	
 
 	CameraStyleFirstPerson.SpringArmLength = 0.0f;
 	CameraStyleFirstPerson.SocketOffset = FVector(11.0f,0.0f,9.0f);
