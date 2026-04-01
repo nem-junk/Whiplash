@@ -91,7 +91,7 @@ protected:
 	virtual void OnWalkInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnJumpInputAction(const FInputActionInstance& Instance);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category="Input|Ability")
 	virtual void OnCrouchInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnStrafeInputAction(const FInputActionInstance& Instance);

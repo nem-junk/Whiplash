@@ -2,8 +2,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "WCharacter.h"
+#include "Component/WAbilityComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/NavMovementComponent.h"
+#include "Tags/WGameplayTags.h"
 
 void AWPlayerController::Crouch()
 {
@@ -191,16 +193,18 @@ void AWPlayerController::OnCrouchInputAction(const FInputActionInstance& Instanc
 	
 	if (AWCharacter * ControlledPawn = GetWhiplashCharacter())
 	{
-		//UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent;
+		UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent;
 		
 		if (ControlledPawn->bIsCrouched)
 		{
 			ControlledPawn->UnCrouch();
+			
 			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,TEXT("Crouch"));
 		}
 		else
 		{
 			ControlledPawn->Crouch();
+			if (AbilityComp) AbilityComp->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
 		}
 		
 	}
