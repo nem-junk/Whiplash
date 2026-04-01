@@ -33,17 +33,31 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly,Category="Abilities")
 	bool bAutoStart;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Tags")
+	FGameplayTag AbilityTag;
+	
+	
+	
+	UFUNCTION(BlueprintNativeEvent,Category="Abilities")
+	void StartAbility(AActor* Instigator);
+	UFUNCTION(BlueprintNativeEvent,Category="Abilities")
+	void StopAbility(AActor* Instigator);
+	
+	UWorld* GetWorld() const override;
 	
 	UFUNCTION(BlueprintNativeEvent,Category="Abilities")
 	bool CanStart(AActor* Instigator);
 	UFUNCTION(BlueprintCallable,Category="Abilities")
 	bool IsRunning() const;
+	
 
 
 
 protected:
 	UPROPERTY()
 	UWAbilityComponent* AbilityComponent;
+	UPROPERTY()
+	UWTagComponent* TagComponent;
 	UPROPERTY(/*ReplicatedUsing="OnRep_"*/)
 	FActionData ActionData;
 	

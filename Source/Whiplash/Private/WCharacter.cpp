@@ -15,6 +15,7 @@
 #include "WInteractionTInterface.h"
 #include "Tags/WGameplayTags.h"
 #include "Tags/WTagComponent.h"
+#include "Component/WAbilityComponent.h"
 
 AWCharacter::AWCharacter()
 {
@@ -23,6 +24,7 @@ AWCharacter::AWCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent");
+	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent");
 
 	bUseControllerRotationYaw = false;
 	MeshComp = GetMesh();

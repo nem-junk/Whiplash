@@ -15,6 +15,7 @@
 #include "WCharacter.generated.h"
 ////////////////////////////////////////
 
+class UWAbilityComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UMotionWarpingComponent;
@@ -36,6 +37,8 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Tag")
 	TObjectPtr<UWTagComponent> TagComponent;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
+	TObjectPtr<UWAbilityComponent> AbilityComponent;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;

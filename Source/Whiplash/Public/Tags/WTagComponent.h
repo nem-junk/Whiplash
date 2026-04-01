@@ -26,11 +26,16 @@ public:
 	bool HasTag(FGameplayTag TagToCheck) const;
 	UFUNCTION(BlueprintPure,Category= "Tags")
 	bool HasTagExact(FGameplayTag TagToCheck) const;
+	UFUNCTION(BlueprintCallable,Category= "Tags")
+	bool HasAnyTags(const FGameplayTagContainer& TagsToCheck) const;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Tags")
+	TMap<FGameplayTag,int32> ActiveTags;
 	
 	
 protected:
 	virtual void BeginPlay() override;
 	
-	TMap<FGameplayTag,int32> ActiveTags;
+	
 
 };

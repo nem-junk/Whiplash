@@ -1,6 +1,11 @@
 ﻿
 #include "Component/WAbilityComponent.h"
+
+#include "WCoreTypes.h"
 #include "Abilities/WAbility.h"
+#include "Engine/ActorChannel.h"
+#include "GeometryCollection/GeometryCollectionParticlesData.h"
+#include "Tags/WTagComponent.h"
 
 
 UWAbilityComponent::UWAbilityComponent()
@@ -13,6 +18,8 @@ UWAbilityComponent::UWAbilityComponent()
 void UWAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	TagComponent = GetOwner()->FindComponentByClass<UWTagComponent>();
+	if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
 	for (TSubclassOf<UWAbility> AbilityClass : DefaultAbilities)
 	{
 		AddAbility(GetOwner(), AbilityClass);
@@ -42,5 +49,61 @@ void UWAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UWAbility> A
 			// NewAbility->StartAction(Instigator);
 		}
 	}
+}
+
+UWAbility* UWAbilityComponent::GetAbility(TSubclassOf<UWAbility> AbilityClass)
+{
+	for (UWAbility* Ability : Abilities)
+	{
+		if (Ability && Ability->IsA(AbilityClass))
+		{
+			return Ability;
+		}
+	}
+	WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("GetAbility() -> return null from GetAbility"));
+	
+	return nullptr;
+}
+
+bool UWAbilityComponent::StartAbilityByTag(AActor* Instigator, FGameplayTag AbilityName)
+{
+	for (UWAbility* Ability : Abilities)
+	{
+		if (Ability && Ability->AbilityTag==AbilityName)
+		{
+			if (!Ability->CanStart(Instigator))
+			{
+				FString FailedMsg = FString::Printf(TEXT("CanStart is false: %s"),*AbilityName.ToString());
+				continue;
+			}
+			// run the ability here when replicated ServerStartAction maybe 
+			Ability->StartAbility(Instigator);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UWAbilityComponent::StopAbilityByTag(AActor* Instigator, FGameplayTag AbilityName)
+{
+	for (UWAbility* Ability : Abilities)
+	{
+		if (Ability && Ability->AbilityTag==AbilityName)
+		{
+			if (Ability->IsRunning())
+			{
+				Ability->StopAbility(Instigator);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+void UWAbilityComponent::RemoveAbility(UWAbility* AbilityToRemove)
+{
+	if (!ensure(AbilityToRemove && !AbilityToRemove->IsRunning())) return;
+	Abilities.Remove(AbilityToRemove);
 }
 

@@ -15,30 +15,47 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class WHIPLASH_API UWAbilityComponent : public UActorComponent
 {
 	GENERATED_BODY()
+	friend class UWAbility;
 
 public:
+
+		
 	UWAbilityComponent();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable,Category="Abilities")
 	void AddAbility(AActor* Instigator,TSubclassOf<UWAbility> AbilityClass);
+	
+	UFUNCTION(BlueprintCallable,Category="Abilities")
+	UWAbility* GetAbility (TSubclassOf<UWAbility> AbilityClass);
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Tags")
-	FGameplayTagContainer ActiveGameplayTags;
-
+	UFUNCTION(BlueprintCallable,Category="Abilities")
+	bool StartAbilityByTag(AActor* Instigator,FGameplayTag AbilityName);
+	
+	UFUNCTION(BlueprintCallable,Category="Abilities")
+	bool StopAbilityByTag(AActor*Instigator, FGameplayTag AbilityName);
+	
+	UFUNCTION(BlueprintCallable,Category="Abilities")
+	void RemoveAbility(UWAbility* AbilityToRemove);
 
 protected:
-	virtual void BeginPlay() override;
-
-
 	UPROPERTY(BlueprintReadOnly,Category="Tags")
 	UWTagComponent* TagComponent;
 	UPROPERTY(BlueprintReadOnly,Category="Abilities")
 	TArray<UWAbility*> Abilities;
-	
 	UPROPERTY(EditAnywhere,Category="Abilities")
 	TArray<TSubclassOf<UWAbility>> DefaultAbilities;
 	
+	
+	
+	virtual void BeginPlay() override;
+	
+/*for replication */
+	/*UFUNCTION(Server,Reliable)
+	void ServerStartAction(AActor*Instigator, FName ActionName);
+	UFUNCTION(Server,Reliable)
+	void ServerStopAction(AActor*Instigator, FName ActionName);*/
 	
 	
 

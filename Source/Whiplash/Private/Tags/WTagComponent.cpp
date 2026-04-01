@@ -48,3 +48,12 @@ bool UWTagComponent::HasTagExact(FGameplayTag TagToCheck) const
 {	
 	return ActiveTags.Contains(TagToCheck);
 }
+
+bool UWTagComponent::HasAnyTags(const FGameplayTagContainer& TagsToCheck) const
+{
+	for (const FGameplayTag& Tag : TagsToCheck)
+	{
+		if (HasTag(Tag)) return true;
+	}
+	return false;
+}

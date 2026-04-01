@@ -5,6 +5,7 @@
 #include "WCoreTypes.generated.h"
 
 WHIPLASH_API DECLARE_LOG_CATEGORY_EXTERN(LogWhiplash,Log,All);
+WHIPLASH_API DECLARE_LOG_CATEGORY_EXTERN(LogWhiplashAbility,Log,All);
 
 #define WHIPLASH_LOG(CategoryName, Verbosity, Format, ...) \
 UE_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__); \

@@ -7,6 +7,7 @@
 #include "WCoreTypes.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Abilities/WAbility.h"
 /////////////////////////////////////////
 #include "WPlayerController.generated.h"
 /////////////////////////////////////////
@@ -19,6 +20,13 @@ UCLASS()
 class WHIPLASH_API AWPlayerController : public APlayerController,public IWPlayerControllerInterface
 {
 	GENERATED_BODY()
+	friend class UWAbilityComponent;
+	friend class UWAbility;
+public:
+	
+	UFUNCTION(BlueprintCallable, Category="Input")
+	void Crouch();
+	
 	
 protected:
 	virtual void SetupInputComponent() override;

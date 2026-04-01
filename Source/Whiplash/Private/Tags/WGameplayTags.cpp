@@ -17,6 +17,7 @@ namespace WhiplashTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Action_Reload, "Ability.Action.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Action_Melee, "Ability.Action.Melee");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Action_Dodge, "Ability.Action.Dodge");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Action_Crouch, "Ability.Action.Crouch")
 
 	// Detection
 	UE_DEFINE_GAMEPLAY_TAG(Detection_Sound, "Detection.Sound");

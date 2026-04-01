@@ -5,6 +5,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/NavMovementComponent.h"
 
+void AWPlayerController::Crouch()
+{
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,TEXT("OMG Baby iam crouching ahhhh..."));
+}
+
 void AWPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -183,12 +188,15 @@ void AWPlayerController::OnJumpInputAction(const FInputActionInstance& Instance)
 
 void AWPlayerController::OnCrouchInputAction(const FInputActionInstance& Instance)
 {
-	#if false
+	
 	if (AWCharacter * ControlledPawn = GetWhiplashCharacter())
 	{
+		//UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent;
+		
 		if (ControlledPawn->bIsCrouched)
 		{
 			ControlledPawn->UnCrouch();
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,TEXT("Crouch"));
 		}
 		else
 		{
@@ -196,7 +204,7 @@ void AWPlayerController::OnCrouchInputAction(const FInputActionInstance& Instanc
 		}
 		
 	}
-	#endif
+	
 	
 }
 
