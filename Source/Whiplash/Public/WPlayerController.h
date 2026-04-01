@@ -59,7 +59,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> JumpInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
-	TSoftObjectPtr<UInputAction> CrouchInputAction;
+	TSoftObjectPtr<UInputAction> CrouchInputActionTriggered;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
+	TSoftObjectPtr<UInputAction> CrouchInputActionCompleted;  
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
@@ -91,8 +93,11 @@ protected:
 	virtual void OnWalkInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnJumpInputAction(const FInputActionInstance& Instance);
-	UFUNCTION(BlueprintCallable, Category="Input|Ability")
-	virtual void OnCrouchInputAction(const FInputActionInstance& Instance);
+	UFUNCTION()
+	virtual void OnCrouchInputActionTriggered(const FInputActionInstance& Instance);
+	UFUNCTION()
+	virtual void OnCrouchInputActionCompleted(const FInputActionInstance& Instance);
+	
 	UFUNCTION()
 	virtual void OnStrafeInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()

@@ -81,6 +81,7 @@ bool UWAbilityComponent::StartAbilityByTag(AActor* Instigator, FGameplayTag Abil
 			return true;
 		}
 	}
+	WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("StartAbilityByTag() -> return null"));
 	return false;
 }
 
@@ -90,13 +91,14 @@ bool UWAbilityComponent::StopAbilityByTag(AActor* Instigator, FGameplayTag Abili
 	{
 		if (Ability && Ability->AbilityTag==AbilityName)
 		{
-			if (Ability->IsRunning())
+			if (!Ability->IsRunning())
 			{
 				Ability->StopAbility(Instigator);
 				return true;
 			}
 		}
 	}
+	WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("StopAbilityByTag() -> return null"));
 	return false;
 }
 

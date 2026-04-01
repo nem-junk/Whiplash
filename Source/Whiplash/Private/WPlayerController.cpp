@@ -5,11 +5,13 @@
 #include "Component/WAbilityComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/NavMovementComponent.h"
+#include "Materials/MaterialExpressionLocalPosition.h"
 #include "Tags/WGameplayTags.h"
 
 void AWPlayerController::Crouch()
 {
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,TEXT("OMG Baby iam crouching ahhhh..."));
+	
 }
 
 void AWPlayerController::SetupInputComponent()
@@ -25,7 +27,8 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,SprintInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,WalkInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,JumpInputAction,ETriggerEvent::Triggered);
-	REGISTER_INPUT_ACTION(EnhancedInputComponent,CrouchInputAction,ETriggerEvent::Triggered);
+	REGISTER_INPUT_ACTION(EnhancedInputComponent, CrouchInputActionTriggered, ETriggerEvent::Triggered);
+	REGISTER_INPUT_ACTION(EnhancedInputComponent, CrouchInputActionCompleted, ETriggerEvent::Completed);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,StrafeInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,PerspectiveInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,AimInputAction,ETriggerEvent::Triggered);
@@ -188,28 +191,54 @@ void AWPlayerController::OnJumpInputAction(const FInputActionInstance& Instance)
 	}
 }
 
-void AWPlayerController::OnCrouchInputAction(const FInputActionInstance& Instance)
+void AWPlayerController::OnCrouchInputActionTriggered(const FInputActionInstance& Instance)
 {
-	
 	if (AWCharacter * ControlledPawn = GetWhiplashCharacter())
 	{
 		UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent;
 		
-		if (ControlledPawn->bIsCrouched)
+		if (AbilityComp)
 		{
-			ControlledPawn->UnCrouch();
+			if (ControlledPawn->bIsCrouched)
+			{
+				AbilityComp->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
+				ControlledPawn->bIsCrouched = false;
 			
-			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,TEXT("Crouch"));
+			}
+			else
+			{
+				AbilityComp->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
+				ControlledPawn->bIsCrouched = true;
+			}
+			
+			
 		}
-		else
-		{
-			ControlledPawn->Crouch();
-			if (AbilityComp) AbilityComp->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
-		}
+	
 		
 	}
 	
+}
+
+void AWPlayerController::OnCrouchInputActionCompleted(const FInputActionInstance& Instance)
+{
+	if (AWCharacter * ControlledPawn = GetWhiplashCharacter())
+	{
+		/*UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent;
+		
+		if (AbilityComp)
+		{
+			if (!ControlledPawn->bIsCrouched)/* ill fix this,there is a better way that to use a bool#1#
+			{
+				AbilityComp->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
+				/*ControlledPawn->bIsCrouched = true;#1#
+			
+			}
+			
+			
+		}*/
 	
+		
+	}
 }
 
 void AWPlayerController::OnStrafeInputAction(const FInputActionInstance& Instance)
