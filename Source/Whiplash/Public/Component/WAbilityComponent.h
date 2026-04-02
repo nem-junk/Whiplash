@@ -16,6 +16,7 @@ class WHIPLASH_API UWAbilityComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	friend class UWAbility;
+	friend class AWCharacter;
 
 public:
 

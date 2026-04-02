@@ -19,7 +19,7 @@ void UWAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	TagComponent = GetOwner()->FindComponentByClass<UWTagComponent>();
-	if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
+	//if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
 	for (TSubclassOf<UWAbility> AbilityClass : DefaultAbilities)
 	{
 		AddAbility(GetOwner(), AbilityClass);
@@ -67,10 +67,13 @@ UWAbility* UWAbilityComponent::GetAbility(TSubclassOf<UWAbility> AbilityClass)
 
 bool UWAbilityComponent::StartAbilityByTag(AActor* Instigator, FGameplayTag AbilityName)
 {
+	
 	for (UWAbility* Ability : Abilities)
 	{
 		if (Ability && Ability->AbilityTag==AbilityName)
 		{
+			
+		
 			if (!Ability->CanStart(Instigator))
 			{
 				FString FailedMsg = FString::Printf(TEXT("CanStart is false: %s"),*AbilityName.ToString());
@@ -85,20 +88,23 @@ bool UWAbilityComponent::StartAbilityByTag(AActor* Instigator, FGameplayTag Abil
 	return false;
 }
 
+
 bool UWAbilityComponent::StopAbilityByTag(AActor* Instigator, FGameplayTag AbilityName)
 {
 	for (UWAbility* Ability : Abilities)
 	{
-		if (Ability && Ability->AbilityTag==AbilityName)
+		if (Ability && Ability->AbilityTag == AbilityName)
 		{
-			if (!Ability->IsRunning())
+		
+			if (Ability->IsRunning())
 			{
 				Ability->StopAbility(Instigator);
+				
 				return true;
 			}
+			
 		}
 	}
-	WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("StopAbilityByTag() -> return null"));
 	return false;
 }
 

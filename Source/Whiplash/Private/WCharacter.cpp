@@ -88,11 +88,41 @@ void AWCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 }
+
+
 void AWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+    
+	if (!TagComponent)
+	{
+		TagComponent = FindComponentByClass<UWTagComponent>();
+	}
+    
+	if (!TagComponent)
+	{
+		WHIPLASH_LOG(LogWhiplash, Error, TEXT("TagComponent still null! Check if component is added to character."));
+		return;
+	}
+    
+	TagComponent->OnTagChanged.AddDynamic(this, &AWCharacter::OnTagChanged);
 
 }
+void AWCharacter::OnTagChanged(FGameplayTag Tag, bool bAdded)
+{
+	if (Tag == WhiplashTags::Ability_Action_Crouch)
+	{
+		if (bAdded)
+		{
+			Crouch();
+		}
+		else
+		{
+			UnCrouch();
+		}
+	}
+}
+
 void AWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

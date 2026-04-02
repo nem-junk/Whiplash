@@ -29,6 +29,8 @@ class WHIPLASH_API AWCharacter : public ACharacter
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
+UFUNCTION(BlueprintCallable,Category="Tags")
+	void OnTagChanged(FGameplayTag Tag, bool bAdded);
 
 	FTransform DefaultCharacterTransform = FTransform(FRotator(0.0f,-90.0f,0.0f).Quaternion(),
 		FVector(0.0f,0.0f,-89.0f),

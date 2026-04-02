@@ -32,7 +32,7 @@ void UWAbility::StartAbility_Implementation(AActor* Instigator)
 			TagComponent->AddTags(Tag);
 		}
 	}
-	//AbilityComp->ActiveGameplayTags.AppendTags(GrantTags);
+
 	
 	ActionData.bIsRunning = true;
 	ActionData.Instigator = Instigator;

@@ -24,8 +24,6 @@ class WHIPLASH_API AWPlayerController : public APlayerController,public IWPlayer
 	friend class UWAbility;
 public:
 	
-	UFUNCTION(BlueprintCallable, Category="Input")
-	void Crouch();
 	
 	
 protected:
@@ -60,8 +58,7 @@ protected:
 	TSoftObjectPtr<UInputAction> JumpInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> CrouchInputActionTriggered;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
-	TSoftObjectPtr<UInputAction> CrouchInputActionCompleted;  
+	  
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
@@ -69,6 +66,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> AimInputAction;
 	
+	bool bIsCrouching = false;
 	/* This function normalizes the input scale when the movement stick mode is set to fixed speed.
 	 * This means any analog input from a gamepad will be converted to max input, similar to the behavior of keyboard movement.
 	 *Improvements will be made to better support variable speeds in the future.*/
@@ -95,8 +93,7 @@ protected:
 	virtual void OnJumpInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnCrouchInputActionTriggered(const FInputActionInstance& Instance);
-	UFUNCTION()
-	virtual void OnCrouchInputActionCompleted(const FInputActionInstance& Instance);
+	
 	
 	UFUNCTION()
 	virtual void OnStrafeInputAction(const FInputActionInstance& Instance);

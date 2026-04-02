@@ -19,9 +19,9 @@ struct FActionData
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	bool bIsRunning;
+	bool bIsRunning = false;
 	UPROPERTY()
-	AActor* Instigator;
+	AActor* Instigator = nullptr;
 };
 
 UCLASS(Blueprintable)
