@@ -110,14 +110,16 @@ void AWCharacter::BeginPlay()
 }
 void AWCharacter::OnTagChanged(FGameplayTag Tag, bool bAdded)
 {
-	if (Tag == WhiplashTags::Ability_Action_Crouch)
+	if (Tag == WhiplashTags::State_Crouching)
 	{
 		if (bAdded)
 		{
+			WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Crouch"));
 			Crouch();
 		}
 		else
 		{
+			WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("UnCrouch"));
 			UnCrouch();
 		}
 	}
