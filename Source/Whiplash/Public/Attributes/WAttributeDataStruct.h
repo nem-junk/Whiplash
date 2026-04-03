@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "AttributeDataStruct.generated.h"
+#include "WAttributeDataStruct.generated.h"
 //#include "UObject/Object.h"
 
 USTRUCT(BlueprintType)

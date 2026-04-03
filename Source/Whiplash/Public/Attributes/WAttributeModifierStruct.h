@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "GameplayTags.h"
-#include "AttributeModifierStruct.generated.h"
+#include "WAttributeModifierStruct.generated.h"
 
 
 
@@ -15,7 +15,7 @@ enum class EModifierOperation : uint8
 
 
 USTRUCT(BlueprintType)
-struct FAttributeModifierStruct
+struct FWAttributeModifierStruct
 {
 	GENERATED_BODY()
 	UPROPERTY()
@@ -30,6 +30,24 @@ struct FAttributeModifierStruct
 	FGameplayTag ID;
 	UPROPERTY()
 	bool bIsActive;
+	
+	FWAttributeModifierStruct(float InMagnitude=0,
+		float InDuration=0,
+		float InInterval=0,
+		EModifierOperation InModifierOperation=EModifierOperation::Add,
+		FGameplayTag InID = FGameplayTag::EmptyTag,
+		bool InbIsActive=false
+		)
+	: Magnitude(InMagnitude),
+	Duration(InDuration),
+	Interval(InInterval),
+	ModifierOperation(InModifierOperation),
+	bIsActive(InbIsActive)
+	{
+		
+	}
+	
+	
 	
 	
 	
