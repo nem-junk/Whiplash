@@ -16,6 +16,7 @@
 #include "Tags/WGameplayTags.h"
 #include "Tags/WTagComponent.h"
 #include "Component/WAbilityComponent.h"
+#include "Attributes/WAttributeSet.h"
 
 AWCharacter::AWCharacter()
 {
@@ -25,6 +26,7 @@ AWCharacter::AWCharacter()
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent");
 	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent");
+	AttributeComponent = CreateDefaultSubobject<UWAttributeSet>("AttributeComponent");
 
 	bUseControllerRotationYaw = false;
 	MeshComp = GetMesh();
@@ -93,6 +95,8 @@ void AWCharacter::PostInitializeComponents()
 void AWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	bWantsToWalk=true;
+	
     
 	if (!TagComponent)
 	{
@@ -114,12 +118,12 @@ void AWCharacter::OnTagChanged(FGameplayTag Tag, bool bAdded)
 	{
 		if (bAdded)
 		{
-			WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Crouch"));
+			//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Crouch"));
 			Crouch();
 		}
 		else
 		{
-			WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("UnCrouch"));
+			//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("UnCrouch"));
 			UnCrouch();
 		}
 	}

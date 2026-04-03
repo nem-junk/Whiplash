@@ -21,6 +21,7 @@ class UCameraComponent;
 class UMotionWarpingComponent;
 class UChooserTable;
 class UWTagComponent;
+class UWAttributeSet;
 UCLASS()
 class WHIPLASH_API AWCharacter : public ACharacter
 {
@@ -41,6 +42,8 @@ UFUNCTION(BlueprintCallable,Category="Tags")
 	TObjectPtr<UWTagComponent> TagComponent;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
 	TObjectPtr<UWAbilityComponent> AbilityComponent;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="AttributeSet")
+	TObjectPtr<UWAttributeSet> AttributeComponent;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;
@@ -60,7 +63,7 @@ UFUNCTION(BlueprintCallable,Category="Tags")
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
 	bool bPreviousWantsFirstPerson = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
-	bool bWantsFirstPerson = false;
+	bool  bWantsFirstPerson = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
 	bool bWantsToSprint = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=Character)
