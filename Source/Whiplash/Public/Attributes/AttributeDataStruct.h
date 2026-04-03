@@ -4,7 +4,7 @@
 #include "AttributeDataStruct.generated.h"
 //#include "UObject/Object.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FAttributeData
 {
 	GENERATED_BODY()
@@ -14,9 +14,9 @@ struct FAttributeData
 	UPROPERTY()
 	float CurrentValue;
 	
-	FAttributeData(float InBaseValue = 0.f,float InCurrentValue = 0.f)
+	FAttributeData(float InBaseValue = 0.f)
 	: BaseValue(InBaseValue),
-	 CurrentValue(InCurrentValue)
+	 CurrentValue(InBaseValue)
 {
 }
 	
