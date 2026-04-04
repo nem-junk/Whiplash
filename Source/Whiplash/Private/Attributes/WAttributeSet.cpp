@@ -12,31 +12,40 @@ void UWAttributeSet::InitializeAttributes()
 
 void UWAttributeSet::RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifiers, float Min, float Max)
 {
-	float FinalValue = Attribute.BaseValue;
-	for (FAttributeModifier& Modifier : Modifiers)
-	{
-		if (Modifier.ModifierOperation==EModifierOperation::Add)
-		{
-			FinalValue+=Modifier.Magnitude;
-		}
-	}
-	for (FAttributeModifier& Modifier : Modifiers)
-	{
-		if (Modifier.ModifierOperation==EModifierOperation::Multiply)
-		{
-			FinalValue*=Modifier.Magnitude;
-		}
-	}
-	for (FAttributeModifier& Modifier : Modifiers)
-	{
-		if (Modifier.ModifierOperation == EModifierOperation::Override)
-		{
-			FinalValue=Modifier.Magnitude;
-		}
-	}
+	bool bHasOverride = false;
+	float OverrideValue = 0;
+	float TotalAdd = 0;
+	float TotalMultiply = 1;
 	
-	ClampAttribute(Attribute,Min,Max);
+	float FinalValue = Attribute.BaseValue;
+	
+	for (const FAttributeModifier& Modifier : Modifiers)
+	{
+		switch (Modifier.ModifierOperation)
+		{
+			case EModifierOperation::Override:
+			bHasOverride = true;
+			OverrideValue=Modifier.Magnitude;
+			break;
+			case EModifierOperation::Add:
+			TotalAdd+=Modifier.Magnitude;
+			break;
+			case EModifierOperation::Multiply:
+			TotalMultiply*=Modifier.Magnitude;
+			break;
+			
+		}
+	}
+	if (bHasOverride)
+	{
+		FinalValue = OverrideValue;
+	}
+	else
+	{
+		FinalValue = (FinalValue + TotalAdd)*TotalMultiply;
+	}
 	Attribute.CurrentValue=FinalValue;
+	ClampAttribute(Attribute,Min,Max);
 	
 }
 
