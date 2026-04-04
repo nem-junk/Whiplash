@@ -4,7 +4,8 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "GameplayTags.h"
-#include "WAttributeDataStruct.h"
+#include "FWAttributeData.h"
+#include "FWAttributeModifier.h"
 
 ////////////////////////////////////
 #include "WAttributeSet.generated.h"
@@ -17,13 +18,13 @@ class WHIPLASH_API UWAttributeSet : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Health")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute|Health")
 	FAttributeData Health = FAttributeData(100);
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Health")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute|Health")
 	FAttributeData MaxHealth = FAttributeData(100);
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute|Stamina")
 	FAttributeData Stamina = FAttributeData(700);
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute|Stamina")
 	FAttributeData MaxStamina = FAttributeData(700);
 	
 	FOnAttributeChange OnHealthChanged;
@@ -32,6 +33,17 @@ public:
 	FOnAttributeDepleted  OnOutOfHealth;
 	FOnAttributeDepleted  OnOutOfStamina;
 	
+	UPROPERTY()
+	bool bIsOutOfHealth = false;
+	UPROPERTY()
+	bool bIsOutOfStamina = false;
+private:
+	UPROPERTY(VisibleAnywhere)
+	TArray<FAttributeModifier> ActiveModifiers;
+	UPROPERTY()
+	TMap<FGameplayTag, FModifierTimerHandle> ActiveModifierTimers;
+	
+	FTimerHandle StaminaRegenDelayHandle;
 	
 	
 public:

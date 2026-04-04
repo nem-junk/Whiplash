@@ -1,26 +1,26 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 //#include "GameFramework/DamageType.h"
-#include "WDamageEventStruct.generated.h"
+#include "FWDamageEvent.generated.h"
 
 class UDamageType;
 
-USTRUCT()
-struct FWDamageEventStruct
+USTRUCT(BlueprintType)
+struct FDamageEventStruct
 {
 	GENERATED_BODY()
-	UPROPERTY()
+	
 	float BaseDamage;
-	UPROPERTY()
+	
 	AActor* Instigator;
-	UPROPERTY()
+	
 	AActor* Causer;
-	UPROPERTY()
+	
 	FHitResult HitResult;
-	UPROPERTY()
+	
 	TSubclassOf<UDamageType> DamageType;
 	
-	FWDamageEventStruct(float InBaseDamage=0,
+	FDamageEventStruct(float InBaseDamage=0,
 		AActor* InInstigator=nullptr,
 		AActor* InCauser=nullptr,
 		FHitResult InHitResult={},

@@ -1,21 +1,21 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "GameplayTags.h"
-#include "WAttributeModifierStruct.generated.h"
+#include "FWAttributeModifier.generated.h"
 
 
 
 UENUM(BlueprintType)
 enum class EModifierOperation : uint8
 {
-	Add =0 UMETA(DisplayName = "Idle"),
+	Add =0 UMETA(DisplayName = "Add"),
 	Multiply = 1 UMETA(DisplayName = "Multiply"),
 	Override = 2 UMETA(DisplayName = "Override")
 };
 
 
 USTRUCT(BlueprintType)
-struct FWAttributeModifierStruct
+struct FAttributeModifier
 {
 	GENERATED_BODY()
 	UPROPERTY()
@@ -27,11 +27,11 @@ struct FWAttributeModifierStruct
 	UPROPERTY()
 	EModifierOperation ModifierOperation;
 	UPROPERTY()
-	FGameplayTag ID;
+	FGameplayTag ID;//remove in future
 	UPROPERTY()
-	bool bIsActive;
+	bool bIsActive;// remove in future
 	
-	FWAttributeModifierStruct(float InMagnitude=0,
+	FAttributeModifier(float InMagnitude=0,
 		float InDuration=0,
 		float InInterval=0,
 		EModifierOperation InModifierOperation=EModifierOperation::Add,
@@ -42,15 +42,20 @@ struct FWAttributeModifierStruct
 	Duration(InDuration),
 	Interval(InInterval),
 	ModifierOperation(InModifierOperation),
+	ID(InID),
 	bIsActive(InbIsActive)
 	{
 		
 	}
 	
-	
-	
-	
-	
-	
+};
+USTRUCT(BlueprintType)
+struct FModifierTimerHandle
+{
+	GENERATED_BODY()
+
+	FTimerHandle TickHandle;
+
+	FTimerHandle ExpiryHandle;
 };
 
