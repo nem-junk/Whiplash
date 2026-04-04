@@ -34,18 +34,43 @@ public:
 	FOnAttributeDepleted  OnOutOfStamina;
 	
 	UPROPERTY()
-	bool bIsOutOfHealth = false;
+	bool bIsOutOfHealth;
 	UPROPERTY()
-	bool bIsOutOfStamina = false;
+	bool bIsOutOfStamina;
 private:
+	
 	UPROPERTY(VisibleAnywhere)
-	TArray<FAttributeModifier> ActiveModifiers;
+	TArray<FAttributeModifier> ActiveHealthModifiers;
+	TArray<FAttributeModifier> ActiveStaminaModifiers;
+	
+	
 	UPROPERTY()
 	TMap<FGameplayTag, FModifierTimerHandle> ActiveModifierTimers;
 	
 	FTimerHandle StaminaRegenDelayHandle;
+	void ClampAttribute(FAttributeData& Attribute,float Min,float Max);
+	/*void SetHealth(float NewValue);
+	void SetStamina(float NewValue);*/
 	
 	
 public:
 	UWorld* GetWorld() const override;
+	
+	void InitializeAttributes();
+	void RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifier,float Min,float Max);
+	/*void ApplyModifiers(FAttributeModifier Modifier);
+	void RemoveModifiers(FGameplayTag ModifierID);
+	
+	
+	void ApplyDamage(float FinalDamage,const FDamageEvent& DamageEvent);
+	void ApplyHealing(float Amount);
+	void StartStaminaDrain();
+	void StopStaminaDrain();
+	void StartStaminaRegen();
+	void StopStaminaRegen();*/
+	float GetHealth() const;
+	float GetMaxHealth() const;
+	float GetStamina() const;
+	float GetMaxStamina() const;
+	
 };

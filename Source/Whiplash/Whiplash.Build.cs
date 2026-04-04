@@ -14,6 +14,8 @@ public class Whiplash : ModuleRules
 			"AnimationWarpingRuntime",
 			"Chooser",
 			"PoseSearch",
+			"GameplayAbilities",
+			"GameplayTasks",
 			"StructUtils" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

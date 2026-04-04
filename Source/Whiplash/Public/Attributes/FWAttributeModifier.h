@@ -8,9 +8,9 @@
 UENUM(BlueprintType)
 enum class EModifierOperation : uint8
 {
-	Add =0 UMETA(DisplayName = "Add"),
+	Add =0 UMETA(DisplayName = "Add (Base)"),
 	Multiply = 1 UMETA(DisplayName = "Multiply"),
-	Override = 2 UMETA(DisplayName = "Override")
+	Override = 2 UMETA(DisplayName = "Divide")
 };
 
 
