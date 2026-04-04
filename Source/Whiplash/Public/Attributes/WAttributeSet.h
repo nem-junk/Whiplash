@@ -49,7 +49,8 @@ private:
 	
 	FTimerHandle StaminaRegenDelayHandle;
 	void ClampAttribute(FAttributeData& Attribute,float Min,float Max);
-	/*void SetHealth(float NewValue);
+	void SetHealth(float NewValue);
+	/*
 	void SetStamina(float NewValue);*/
 	
 	
@@ -57,7 +58,7 @@ public:
 	UWorld* GetWorld() const override;
 	
 	void InitializeAttributes();
-	void RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifier,float Min,float Max);
+	void RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifiers,float Min,float Max);
 	/*void ApplyModifiers(FAttributeModifier Modifier);
 	void RemoveModifiers(FGameplayTag ModifierID);
 	

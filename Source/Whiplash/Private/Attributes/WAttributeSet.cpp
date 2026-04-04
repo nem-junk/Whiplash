@@ -10,16 +10,50 @@ void UWAttributeSet::InitializeAttributes()
 	bIsOutOfStamina=false;
 }
 
-void UWAttributeSet::RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifier, float Min, float Max)
+void UWAttributeSet::RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifiers, float Min, float Max)
 {
-	float FinalValue = Health.BaseValue;
+	float FinalValue = Attribute.BaseValue;
+	for (FAttributeModifier& Modifier : Modifiers)
+	{
+		if (Modifier.ModifierOperation==EModifierOperation::Add)
+		{
+			FinalValue+=Modifier.Magnitude;
+		}
+	}
+	for (FAttributeModifier& Modifier : Modifiers)
+	{
+		if (Modifier.ModifierOperation==EModifierOperation::Multiply)
+		{
+			FinalValue*=Modifier.Magnitude;
+		}
+	}
+	for (FAttributeModifier& Modifier : Modifiers)
+	{
+		if (Modifier.ModifierOperation == EModifierOperation::Override)
+		{
+			FinalValue=Modifier.Magnitude;
+		}
+	}
 	
+	ClampAttribute(Attribute,Min,Max);
+	Attribute.CurrentValue=FinalValue;
 	
 }
 
 void UWAttributeSet::ClampAttribute(FAttributeData& Attribute, float Min, float Max)
 {
 	if (Min<=Max) Attribute.CurrentValue=FMath::Clamp(Attribute.CurrentValue, Min, Max);
+	
+}
+
+void UWAttributeSet::SetHealth(float NewValue)
+{
+	float OldValue = Health.CurrentValue;
+	Health.CurrentValue=NewValue;
+	ClampAttribute(Health,0,MaxHealth.CurrentValue);
+	OnHealthChanged.Broadcast(OldValue,Health.CurrentValue);
+	if (Health.CurrentValue<=0 and !bIsOutOfHealth){OnOutOfHealth.Broadcast(); bIsOutOfHealth=true;}
+	if (Health.CurrentValue>0 and bIsOutOfHealth){bIsOutOfHealth = false;}	
 	
 }
 
