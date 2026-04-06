@@ -33,9 +33,30 @@ public:
 	FOnAttributeDepleted  OnOutOfHealth;
 	FOnAttributeDepleted  OnOutOfStamina;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaDrainMag;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaDrainDuration;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaDrainInterval;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	FGameplayTag StaminaDrainID;
+	//UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	//FGameplayTag StaminaID;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float RegenDelay;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaRegenMag;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaRegenDuration;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	float StaminaRegenInterval;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
+	FGameplayTag StaminaRegenID;
+	
+	//UPROPERTY()
 	bool bIsOutOfHealth;
-	UPROPERTY()
+//	UPROPERTY()
 	bool bIsOutOfStamina;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Attribute|Immunity")
 	bool bIsDamageImmune = false;
@@ -64,7 +85,7 @@ public:
 	
 	void InitializeAttributes();
 	void RecalculateAttribute(FAttributeData& Attribute,const TArray<FAttributeModifier>& Modifiers,float Min,float Max);
-	void ApplyModifiers(FAttributeModifier Modifier);
+	void ApplyModifier(FAttributeModifier Modifier);
 	void RemoveModifier(FGameplayTag ModifierID);
 	/*
 	
@@ -72,10 +93,11 @@ public:
 	
 	
 
+	*/
 	void StartStaminaDrain();
 	void StopStaminaDrain();
 	void StartStaminaRegen();
-	void StopStaminaRegen();*/
+	void StopStaminaRegen();
 	void ApplyDamage(float FinalDamage);
 	float GetHealth() const;
 	float GetMaxHealth() const;

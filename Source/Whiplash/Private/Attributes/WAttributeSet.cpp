@@ -1,7 +1,11 @@
 ﻿
 #include "Attributes/WAttributeSet.h"
 
-#include "VREditorMode.h"
+#include <Programs/UnrealBuildAccelerator/Core/Public/UbaBase.h>
+
+
+#include "LandscapeEditLayerTypes.h"
+#include "LocalizationDescriptor.h"
 #include "WCoreTypes.h"
 
 
@@ -51,7 +55,7 @@ void UWAttributeSet::RecalculateAttribute(FAttributeData& Attribute,const TArray
 }
 
 
-void UWAttributeSet::ApplyModifiers(FAttributeModifier Modifier)
+void UWAttributeSet::ApplyModifier(FAttributeModifier Modifier)
 {
 	if (Modifier.Duration == 0 )
 	{
@@ -121,6 +125,46 @@ void UWAttributeSet::RemoveModifier(FGameplayTag ModifierID)
 	}
 }
 
+void UWAttributeSet::StartStaminaDrain()
+{
+	StopStaminaRegen();
+	if (GetWorld()) GetWorld()->GetTimerManager().ClearTimer(StaminaRegenDelayHandle);
+	FAttributeModifier StaminaDrain(-StaminaDrainMag,StaminaDrainDuration,StaminaDrainInterval,EModifierOperation::Add,
+		EAttributeTarget::Stamina,StaminaDrainID);
+	ApplyModifier(StaminaDrain);
+}
+
+void UWAttributeSet::StopStaminaDrain()
+{
+	RemoveModifier(StaminaDrainID);
+	    
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(StaminaRegenDelayHandle);
+		GetWorld()->GetTimerManager().SetTimer(StaminaRegenDelayHandle, [this]()
+		{
+			StartStaminaRegen();
+		},
+		RegenDelay, false);
+	}
+    
+	
+}
+
+void UWAttributeSet::StartStaminaRegen()
+{
+	if (GetStamina() >= MaxStamina.CurrentValue) return;
+	FAttributeModifier StaminaRegen(StaminaRegenMag,StaminaRegenDuration,StaminaRegenInterval,
+		EModifierOperation::Add,EAttributeTarget::Stamina,StaminaRegenID);
+	ApplyModifier(StaminaRegen);
+	
+}
+
+void UWAttributeSet::StopStaminaRegen()
+{
+	RemoveModifier(StaminaRegenID);
+}
+
 void UWAttributeSet::ApplyAttributeChange(EAttributeTarget Target, float Magnitude)
 {
 		switch (Target)
@@ -152,6 +196,7 @@ void UWAttributeSet::ClampAttribute(FAttributeData& Attribute, float Min, float 
 void UWAttributeSet::SetHealth(float NewValue)
 {
 	float OldValue = Health.CurrentValue;
+	
 	Health.CurrentValue=NewValue;
 	if (FMath::IsNearlyEqual(OldValue,Health.CurrentValue))
 	{
@@ -177,8 +222,16 @@ void UWAttributeSet::SetStamina(float NewValue)
 	}
 	ClampAttribute(Stamina,0,MaxStamina.CurrentValue);
 	OnStaminaChanged.Broadcast(OldValue,Stamina.CurrentValue);
-	if (Stamina.CurrentValue<=0 and !bIsOutOfStamina){OnOutOfStamina.Broadcast(); bIsOutOfStamina=true;}
+	if (Stamina.CurrentValue<=0 and !bIsOutOfStamina)
+	{
+		OnOutOfStamina.Broadcast(); bIsOutOfStamina=true;
+	}
 	else if (Stamina.CurrentValue>0 and bIsOutOfStamina){bIsOutOfStamina = false;}
+	if (Stamina.CurrentValue>= MaxStamina.CurrentValue and ActiveModifierTimers.Contains(StaminaRegenID))
+	{
+		//Stamina.CurrentValue=MaxStamina.CurrentValue;
+		StopStaminaRegen();
+	}
 }
 
 

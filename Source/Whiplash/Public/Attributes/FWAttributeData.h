@@ -9,9 +9,9 @@ struct FAttributeData
 {
 	GENERATED_BODY()
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Attribute|Health")
 	float BaseValue;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Attribute|Health")
 	float CurrentValue;
 	
 	FAttributeData(float InBaseValue = 0.f)
