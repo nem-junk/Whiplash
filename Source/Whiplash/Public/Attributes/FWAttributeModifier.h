@@ -13,6 +13,12 @@ enum class EModifierOperation : uint8
 	Override = 2 UMETA(DisplayName = "Override")
 };
 
+UENUM(BlueprintType)
+enum class EAttributeTarget : uint8
+{
+	Health =0 UMETA(DisplayName = "Health"),
+	Stamina =1 UMETA(DisplayName = "Stamina")
+};
 
 USTRUCT(BlueprintType)
 struct FAttributeModifier
@@ -27,19 +33,22 @@ struct FAttributeModifier
 	
 	EModifierOperation ModifierOperation;
 	
+	EAttributeTarget Target; // whom to modify
+	
 	FGameplayTag ID;//remove in future
 	
 	FAttributeModifier(float InMagnitude=0,
 		float InDuration=0,
 		float InInterval=0,
 		EModifierOperation InModifierOperation=EModifierOperation::Add,
-		FGameplayTag InID = FGameplayTag::EmptyTag,
-		bool InbIsActive=false
+		EAttributeTarget InTarget=EAttributeTarget::Health,
+		FGameplayTag InID = FGameplayTag::EmptyTag
 		)
 	: Magnitude(InMagnitude),
 	Duration(InDuration),
 	Interval(InInterval),
 	ModifierOperation(InModifierOperation),
+	Target(InTarget),
 	ID(InID)
 	{
 		

@@ -37,10 +37,13 @@ public:
 	bool bIsOutOfHealth;
 	UPROPERTY()
 	bool bIsOutOfStamina;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Attribute|Immunity")
+	bool bIsDamageImmune = false;
 private:
-	
+	//Ongoing Modifiers 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FAttributeModifier> ActiveHealthModifiers;
+	UPROPERTY(VisibleAnywhere)
 	TArray<FAttributeModifier> ActiveStaminaModifiers;
 	
 	
@@ -50,28 +53,34 @@ private:
 	FTimerHandle StaminaRegenDelayHandle;
 	void ClampAttribute(FAttributeData& Attribute,float Min,float Max);
 	void SetHealth(float NewValue);
+	void SetStamina(float NewValue);
+	void ApplyAttributeChange(EAttributeTarget Target, float Magnitude);
 	/*
-	void SetStamina(float NewValue);*/
+	*/
 	
 	
 public:
-	UWorld* GetWorld() const override;
+	virtual UWorld* GetWorld() const override;
 	
 	void InitializeAttributes();
-	void RecalculateAttribute(FAttributeData& Attribute,TArray<FAttributeModifier>& Modifiers,float Min,float Max);
-	/*void ApplyModifiers(FAttributeModifier Modifier);
-	void RemoveModifiers(FGameplayTag ModifierID);
+	void RecalculateAttribute(FAttributeData& Attribute,const TArray<FAttributeModifier>& Modifiers,float Min,float Max);
+	void ApplyModifiers(FAttributeModifier Modifier);
+	void RemoveModifier(FGameplayTag ModifierID);
+	/*
 	
 	
-	void ApplyDamage(float FinalDamage,const FDamageEvent& DamageEvent);
-	void ApplyHealing(float Amount);
+	
+	
+
 	void StartStaminaDrain();
 	void StopStaminaDrain();
 	void StartStaminaRegen();
 	void StopStaminaRegen();*/
+	void ApplyDamage(float FinalDamage);
 	float GetHealth() const;
 	float GetMaxHealth() const;
 	float GetStamina() const;
 	float GetMaxStamina() const;
+	void ApplyHealing(float Amount);
 	
 };
