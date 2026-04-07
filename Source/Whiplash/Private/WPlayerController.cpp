@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "WCharacter.h"
+#include "Attributes/WAttributeSet.h"
 #include "Component/WAbilityComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/NavMovementComponent.h"
@@ -145,8 +146,10 @@ void AWPlayerController::OnSprintInputAction(const FInputActionInstance& Instanc
 {
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
-		// Sprint Input (Coming in 5.5)
+		
 		ControlledPawn->bWantsToSprint = Instance.GetValue().Get<bool>();
+		if (ControlledPawn->bWantsToSprint)WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("true")); ControlledPawn->AttributeSet->StartStaminaDrain();
+		if (!ControlledPawn->bWantsToSprint)WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("false")); ControlledPawn->AttributeSet->StartStaminaRegen();
 		ControlledPawn->bWantsToWalk = false;
 	}
 }

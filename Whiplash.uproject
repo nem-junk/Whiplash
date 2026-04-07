@@ -73,9 +73,12 @@
 			"Name": "PCGWaterInterop",
 			"Enabled": true
 		},
-	
 		{
 			"Name": "StaticMeshEditorModeling",
+			"Enabled": true
+		},
+		{
+			"Name": "CommonUI",
 			"Enabled": true
 		}
 	]

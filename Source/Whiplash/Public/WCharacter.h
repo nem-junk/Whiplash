@@ -8,7 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "PoseSearch/PoseSearchTrajectoryLibrary.h"
 #include "WTraversalComponent.h"
-
+#include "Attributes/FWDamageEvent.h"
 
 
 ////////////////////////////////////////
@@ -22,6 +22,8 @@ class UMotionWarpingComponent;
 class UChooserTable;
 class UWTagComponent;
 class UWAttributeSet;
+class UWStaminaBarWid;
+class UMainHUD;
 UCLASS()
 class WHIPLASH_API AWCharacter : public ACharacter
 {
@@ -43,7 +45,7 @@ UFUNCTION(BlueprintCallable,Category="Tags")
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
 	TObjectPtr<UWAbilityComponent> AbilityComponent;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="AttributeSet")
-	TObjectPtr<UWAttributeSet> AttributeComponent;
+	TObjectPtr<UWAttributeSet> AttributeSet;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;
@@ -51,8 +53,19 @@ UFUNCTION(BlueprintCallable,Category="Tags")
 	TObjectPtr<UCapsuleComponent> WCapsuleComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UWStaminaBarWid> StaminaWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UMainHUD> MainHUDClass;
+	UPROPERTY()
+	UMainHUD* MainHUDptr;
+	
+	UPROPERTY(EditAnywhere, Category="Test|StaminaConfig")
+	FGameplayTag StaminaDrainID;
 
-
+	UPROPERTY(EditAnywhere, Category="Test|StaminaConfig")
+	FGameplayTag StaminaRegenID;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Character)
 	TObjectPtr<USpringArmComponent> SpringArm;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Character)
@@ -174,7 +187,14 @@ public:
 	bool bDoingTraversalAction = false;
 
 
-
+private:
+	void OnOutOfHealth();
+	void OnHealthChanged(float OldHealth, float NewHealth );
+	void OnStaminaChanged(float OldStamina,float NewStamina);
+	void OnOutOfStamina();
+	
+	void ReceiveDamage(const FDamageEventStruct& DamageEvent);
+	
 
 
 

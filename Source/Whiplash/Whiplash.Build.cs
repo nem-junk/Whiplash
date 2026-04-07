@@ -16,7 +16,11 @@ public class Whiplash : ModuleRules
 			"PoseSearch",
 			"GameplayAbilities",
 			"GameplayTasks",
-			"StructUtils" });
+			"StructUtils",
+			"UMG",
+			"Slate",
+			"SlateCore"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
