@@ -8,7 +8,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "PoseSearch/PoseSearchTrajectoryLibrary.h"
 #include "WTraversalComponent.h"
+#include "Attributes/FWAttributeModifier.h"
 #include "Attributes/FWDamageEvent.h"
+#include "Tags/WGameplayTags.h"
 
 
 ////////////////////////////////////////
@@ -60,11 +62,22 @@ UFUNCTION(BlueprintCallable,Category="Tags")
 	UPROPERTY()
 	UMainHUD* MainHUDptr;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="AttributeSet|Stamina")
+	FAttributeModifier StaminaDrainModCh= FAttributeModifier(-15.f, -1.f, 0.1f, 
+		EModifierOperation::Add, 
+		EAttributeTarget::Stamina, 
+		FGameplayTag::EmptyTag);
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AttributeSet|Stamina")
+	FAttributeModifier StaminaRegenModCh= FAttributeModifier(15.f, -1.f, 0.1f, 
+		EModifierOperation::Add, 
+		EAttributeTarget::Stamina, 
+		FGameplayTag::EmptyTag);
+	
 	UPROPERTY(EditAnywhere, Category="Test|StaminaConfig")
-	FGameplayTag StaminaDrainID;
+	FGameplayTag StaminaDrainID = WhiplashTags::Modifier_Stamina_Drain;
 
 	UPROPERTY(EditAnywhere, Category="Test|StaminaConfig")
-	FGameplayTag StaminaRegenID;
+	FGameplayTag StaminaRegenID = WhiplashTags::Modifier_Stamina_Regen;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Character)
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -195,6 +208,7 @@ private:
 	
 	void ReceiveDamage(const FDamageEventStruct& DamageEvent);
 	
+	void SetAttributeValues();
 
 
 

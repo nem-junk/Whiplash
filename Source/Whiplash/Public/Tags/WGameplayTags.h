@@ -21,4 +21,8 @@ namespace WhiplashTags
 	WHIPLASH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Action_Crouch)
 	// Detection
 	WHIPLASH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Detection_Sound);
+	
+	//Modifiers
+	WHIPLASH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Modifier_Stamina_Drain);
+	WHIPLASH_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Modifier_Stamina_Regen);
 }

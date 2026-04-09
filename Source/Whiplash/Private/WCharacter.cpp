@@ -20,7 +20,15 @@
 #include "BFL/WDamageHelper.h"
 #include "UI/WStaminaBarWid.h"
 #include "UI/MainHUD.h"
-
+/*WHIPLASH_LOG(LogWhiplashAbility, Error, TEXT("StaminaRegenMod -> Mag: %f, Dur: %f, Int: %f, Op: %d, Target: %d, ID: %s"), 
+AttributeSet->StaminaDrainMod.Magnitude, 
+AttributeSet->StaminaDrainMod.Duration, 
+AttributeSet->StaminaDrainMod.Interval, 
+static_cast<int32>(AttributeSet->StaminaDrainMod.ModifierOperation), 
+static_cast<int32>(AttributeSet->StaminaDrainMod.Target), 
+*AttributeSet->StaminaDrainMod.ID.ToString());
+}*/
+//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Stamina: %f"),AttributeSet->GetStamina());
 AWCharacter::AWCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -87,26 +95,14 @@ AWCharacter::AWCharacter()
 	CameraStyleThirdPersonClose.TranslationLagSpeed = 15.0f;
 	CameraStyleThirdPersonClose.FieldOfView = 80.0f;
 	CameraStyleThirdPersonClose.TransitionSpeed = 5.0f;
+	
+
+
 }
 void AWCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	AttributeSet = NewObject<UWAttributeSet>(this);
-	check(AttributeSet);
-	AttributeSet->InitializeAttributes();
-	AttributeSet->OnOutOfHealth.AddUObject(this, &AWCharacter::OnOutOfHealth);
-	AttributeSet->OnHealthChanged.AddUObject(this, &AWCharacter::OnHealthChanged);
-	AttributeSet->OnOutOfStamina.AddUObject(this, &AWCharacter::OnOutOfStamina);
-	AttributeSet->OnStaminaChanged.AddUObject(this, &AWCharacter::OnStaminaChanged);
-	AttributeSet->StaminaDrainMag=15;
-	AttributeSet->StaminaDrainDuration=-1.f;
-	AttributeSet->StaminaDrainInterval=0.1;
-	AttributeSet->StaminaRegenMag=10;
-	AttributeSet->StaminaRegenDuration=-1.f;
-	AttributeSet->StaminaRegenInterval=0.1;
-	AttributeSet->RegenDelay=1.5;
-	AttributeSet->StaminaDrainID=StaminaDrainID;
-	AttributeSet->StaminaRegenID=StaminaRegenID;
+	SetAttributeValues();
 	
 }
 
@@ -116,17 +112,12 @@ void AWCharacter::BeginPlay()
 	Super::BeginPlay();
 	bWantsToWalk=true;
 	
-	//StaminaWidget = CreateWidget<UWStaminaBarWid>(GetWorld(),StaminaWidgetClass);
+	
 	MainHUDptr =  CreateWidget<UMainHUD>(GetWorld(),MainHUDClass);
 	check(MainHUDptr);
 	MainHUDptr->AddToViewport(1);
-	//check(StaminaWidget);
-	//StaminaWidget->AddToViewport(1);
 	AttributeSet->OnStaminaChanged.AddUObject(this,&AWCharacter::OnStaminaChanged);
 	
-	
-	
-    
 	if (!TagComponent)
 	{
 		TagComponent = FindComponentByClass<UWTagComponent>();
@@ -148,6 +139,7 @@ void AWCharacter::Tick(float DeltaTime)
 	UpdateMovement();
 	UpdateRotation();
 	UpdateCamera(true);
+
 }
 void AWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -170,10 +162,7 @@ void AWCharacter::OnHealthChanged(float OldHealth, float NewHealth )
 
 void AWCharacter::OnStaminaChanged(float OldStamina,float NewStamina)
 {
-	if (!MainHUDptr->StaminaWidget) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("NULLStaminaWidget"));
 	if (MainHUDptr&&MainHUDptr->StaminaWidget)MainHUDptr->StaminaWidget->UpdateStaminaBar(AttributeSet->GetStamina(),AttributeSet->GetMaxStamina());
-	
-	
 }
 
 void AWCharacter::OnOutOfStamina()
@@ -183,6 +172,31 @@ void AWCharacter::OnOutOfStamina()
 void AWCharacter::ReceiveDamage(const FDamageEventStruct& DamageEvent)
 {
 	//UWDamageHelper::CalculateDamage(AttributeSet->);
+}
+
+void AWCharacter::SetAttributeValues()
+{
+	AttributeSet = NewObject<UWAttributeSet>(this);
+	check(AttributeSet);
+	AttributeSet->InitializeAttributes();
+	AttributeSet->OnOutOfHealth.AddUObject(this, &AWCharacter::OnOutOfHealth);
+	AttributeSet->OnHealthChanged.AddUObject(this, &AWCharacter::OnHealthChanged);
+	AttributeSet->OnOutOfStamina.AddUObject(this, &AWCharacter::OnOutOfStamina);
+	AttributeSet->OnStaminaChanged.AddUObject(this, &AWCharacter::OnStaminaChanged);
+	AttributeSet->RegenDelay=1.5;
+	AttributeSet->StaminaDrainMod.Magnitude=StaminaDrainModCh.Magnitude;
+	AttributeSet->StaminaDrainMod.Duration=StaminaDrainModCh.Duration;
+	AttributeSet->StaminaDrainMod.Interval=StaminaDrainModCh.Interval;
+	AttributeSet->StaminaDrainMod.ModifierOperation=StaminaDrainModCh.ModifierOperation;
+	AttributeSet->StaminaDrainMod.Target=EAttributeTarget::Stamina;
+	AttributeSet->StaminaDrainMod.ID=StaminaDrainID;
+	
+	AttributeSet->StaminaRegenMod.Magnitude=StaminaRegenModCh.Magnitude;
+	AttributeSet->StaminaRegenMod.Duration=StaminaRegenModCh.Duration;
+	AttributeSet->StaminaRegenMod.Interval=StaminaRegenModCh.Interval;
+	AttributeSet->StaminaRegenMod.ModifierOperation=StaminaRegenModCh.ModifierOperation;
+	AttributeSet->StaminaRegenMod.Target=EAttributeTarget::Stamina;
+	AttributeSet->StaminaRegenMod.ID=StaminaRegenID;
 }
 
 void AWCharacter::OnTagChanged(FGameplayTag Tag, bool bAdded)

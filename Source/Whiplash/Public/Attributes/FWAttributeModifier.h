@@ -24,17 +24,17 @@ USTRUCT(BlueprintType)
 struct FAttributeModifier
 {
 	GENERATED_BODY()
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Magnitude;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Duration;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Interval;//tick value
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EModifierOperation ModifierOperation;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAttributeTarget Target; // whom to modify
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag ID;//remove in future
 	
 	FAttributeModifier(float InMagnitude=0,

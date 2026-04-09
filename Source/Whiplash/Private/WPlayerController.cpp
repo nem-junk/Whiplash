@@ -21,7 +21,7 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,MoveWorldSpaceInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,LookInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,LookGamepadInputAction,ETriggerEvent::Triggered);
-	REGISTER_INPUT_ACTION(EnhancedInputComponent,SprintInputAction,ETriggerEvent::Triggered);
+	REGISTER_INPUT_ACTION(EnhancedInputComponent,SprintInputAction,ETriggerEvent::Started);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,WalkInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,JumpInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent, CrouchInputActionTriggered, ETriggerEvent::Started);
@@ -146,11 +146,17 @@ void AWPlayerController::OnSprintInputAction(const FInputActionInstance& Instanc
 {
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
+		ControlledPawn->bWantsToSprint = !ControlledPawn->bWantsToSprint;
+		if (ControlledPawn->bWantsToSprint)
+		{
+			ControlledPawn->AttributeSet->StartStaminaDrain();
+		}
+		else if (!ControlledPawn->bWantsToSprint)
+		{
+			ControlledPawn->AttributeSet->StopStaminaDrain();
+			
+		}
 		
-		ControlledPawn->bWantsToSprint = Instance.GetValue().Get<bool>();
-		if (ControlledPawn->bWantsToSprint)WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("true")); ControlledPawn->AttributeSet->StartStaminaDrain();
-		if (!ControlledPawn->bWantsToSprint)WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("false")); ControlledPawn->AttributeSet->StartStaminaRegen();
-		ControlledPawn->bWantsToWalk = false;
 	}
 }
 

@@ -17,6 +17,7 @@ UCLASS()
 class WHIPLASH_API UWAttributeSet : public UObject
 {
 	GENERATED_BODY()
+	
 public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute|Health")
 	FAttributeData Health = FAttributeData(100);
@@ -32,6 +33,11 @@ public:
 	FOnAttributeChange OnStaminaChanged;
 	FOnAttributeDepleted  OnOutOfHealth;
 	FOnAttributeDepleted  OnOutOfStamina;
+	
+	UPROPERTY()
+	FAttributeModifier StaminaDrainMod;
+	UPROPERTY()
+	FAttributeModifier StaminaRegenMod;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attribute|Stamina")
 	float StaminaDrainMag;

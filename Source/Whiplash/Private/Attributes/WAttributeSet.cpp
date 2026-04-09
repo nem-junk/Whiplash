@@ -23,7 +23,7 @@ void UWAttributeSet::RecalculateAttribute(FAttributeData& Attribute,const TArray
 	float TotalAdd = 0;
 	float TotalMultiply = 1;
 	
-	float FinalValue = Attribute.BaseValue;
+	float FinalValue = Attribute.CurrentValue;
 	
 	for (const FAttributeModifier& Modifier : Modifiers)
 	{
@@ -62,6 +62,7 @@ void UWAttributeSet::ApplyModifier(FAttributeModifier Modifier)
 		ApplyAttributeChange(Modifier.Target,Modifier.Magnitude);
 		return;
 	}
+	
 	if (Modifier.Target==EAttributeTarget::Health)
 	{
 		ActiveHealthModifiers.Add(Modifier);
@@ -72,6 +73,7 @@ void UWAttributeSet::ApplyModifier(FAttributeModifier Modifier)
 		
 	}
 	FModifierTimerHandle Handles;
+	
 	if (Modifier.Interval > 0 and GetWorld())
 	{
 		FTimerDelegate TickDelegate;
@@ -95,7 +97,9 @@ void UWAttributeSet::ApplyModifier(FAttributeModifier Modifier)
 
 void UWAttributeSet::RemoveModifier(FGameplayTag ModifierID)
 {
+	//WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("RemoveModifier called — ID: %s"), *ModifierID.ToString());
 	FModifierTimerHandle* ModifierToRemove = ActiveModifierTimers.Find(ModifierID);
+	//WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("RemoveModifier — Found: %s"), ModifierToRemove ? TEXT("YES") : TEXT("NO"));
 	if (!ModifierToRemove) return;
 	if (GetWorld())
 	{
@@ -131,13 +135,20 @@ void UWAttributeSet::StartStaminaDrain()
 	if (GetWorld()) GetWorld()->GetTimerManager().ClearTimer(StaminaRegenDelayHandle);
 	FAttributeModifier StaminaDrain(-StaminaDrainMag,StaminaDrainDuration,StaminaDrainInterval,EModifierOperation::Add,
 		EAttributeTarget::Stamina,StaminaDrainID);
-	ApplyModifier(StaminaDrain);
+	//FAttributeModifier StaminaDrain = StaminaDrainMod;
+	ApplyModifier(StaminaDrainMod);
 }
+void UWAttributeSet::StartStaminaRegen()
+{
+	if (GetStamina() >= MaxStamina.CurrentValue) return;
+	ApplyModifier(StaminaRegenMod);
+}
+
 
 void UWAttributeSet::StopStaminaDrain()
 {
-	RemoveModifier(StaminaDrainID);
-	    
+	RemoveModifier(StaminaDrainMod.ID);
+	
 	if (GetWorld())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(StaminaRegenDelayHandle);
@@ -147,22 +158,13 @@ void UWAttributeSet::StopStaminaDrain()
 		},
 		RegenDelay, false);
 	}
-    
 	
 }
 
-void UWAttributeSet::StartStaminaRegen()
-{
-	if (GetStamina() >= MaxStamina.CurrentValue) return;
-	FAttributeModifier StaminaRegen(StaminaRegenMag,StaminaRegenDuration,StaminaRegenInterval,
-		EModifierOperation::Add,EAttributeTarget::Stamina,StaminaRegenID);
-	ApplyModifier(StaminaRegen);
-	
-}
 
 void UWAttributeSet::StopStaminaRegen()
 {
-	RemoveModifier(StaminaRegenID);
+	RemoveModifier(StaminaRegenMod.ID);
 }
 
 void UWAttributeSet::ApplyAttributeChange(EAttributeTarget Target, float Magnitude)
@@ -214,6 +216,7 @@ void UWAttributeSet::SetHealth(float NewValue)
 void UWAttributeSet::SetStamina(float NewValue)
 {
 	float OldValue = Stamina.CurrentValue;
+	
 	Stamina.CurrentValue=NewValue;
 	if (FMath::IsNearlyEqual(OldValue,Stamina.CurrentValue))
 	{
@@ -227,9 +230,9 @@ void UWAttributeSet::SetStamina(float NewValue)
 		OnOutOfStamina.Broadcast(); bIsOutOfStamina=true;
 	}
 	else if (Stamina.CurrentValue>0 and bIsOutOfStamina){bIsOutOfStamina = false;}
-	if (Stamina.CurrentValue>= MaxStamina.CurrentValue and ActiveModifierTimers.Contains(StaminaRegenID))
+	if (Stamina.CurrentValue>= MaxStamina.CurrentValue and ActiveModifierTimers.Contains(StaminaRegenMod.ID))
 	{
-		//Stamina.CurrentValue=MaxStamina.CurrentValue;
+		
 		StopStaminaRegen();
 	}
 }
@@ -248,21 +251,6 @@ UWorld* UWAttributeSet::GetWorld() const
 	check(Outer);
 	return Outer->GetWorld();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 ///
