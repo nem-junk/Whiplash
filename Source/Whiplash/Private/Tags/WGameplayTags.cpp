@@ -10,6 +10,10 @@ namespace WhiplashTags
 	UE_DEFINE_GAMEPLAY_TAG(State_HoldingBreath, "State.HoldingBreath");
 	UE_DEFINE_GAMEPLAY_TAG(State_Stunned, "State.Stunned");
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead");
+	UE_DEFINE_GAMEPLAY_TAG(State_ADS, "State.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(State_Firing, "State.Firing");
+	UE_DEFINE_GAMEPLAY_TAG(State_WeaponEquipped,"State.WeaponEquipped");
+	UE_DEFINE_GAMEPLAY_TAG(Weapon_Pistol,"Weapon.Pistol");
 
 	// Abilities
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Action, "Ability.Action");
