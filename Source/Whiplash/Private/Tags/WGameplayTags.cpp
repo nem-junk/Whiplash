@@ -28,4 +28,18 @@ namespace WhiplashTags
 	//Modifiers
 	UE_DEFINE_GAMEPLAY_TAG(Modifier_Stamina_Drain, "Modifier.Stamina.Drain");
 	UE_DEFINE_GAMEPLAY_TAG(Modifier_Stamina_Regen, "Modifier.Stamina.Regen");
+	
+	// Damge Zones 
+	
+	UE_DEFINE_GAMEPLAY_TAG(DamageZone_Head,"DamageZone.Head");
+	UE_DEFINE_GAMEPLAY_TAG(DamageZone_Torso,"DamageZone.Torso");
+	UE_DEFINE_GAMEPLAY_TAG(DamageZone_Limbs,"DamageZone.Limbs");
+	
+	//Phy
+	UE_DEFINE_GAMEPLAY_TAG(PhysicalMaterial_Concrete,"PhysicalMaterial.Concrete");
+	UE_DEFINE_GAMEPLAY_TAG(PhysicalMaterial_Metal,"PhysicalMaterial.Metal");
+	UE_DEFINE_GAMEPLAY_TAG(PhysicalMaterial_Wood,"PhysicalMaterial.Wood");
+	//UE_DEFINE_GAMEPLAY_TAG(PhysicalMaterial_Carpet,"PhysicalMaterial.Carpet");
+	UE_DEFINE_GAMEPLAY_TAG(PhysicalMaterial_Dirt,"PhysicalMaterial.Dirt");
+	
 }
