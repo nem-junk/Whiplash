@@ -646,3 +646,22 @@ float AWCharacter::CalculateMaxSpeed() const
 	return INDEX_NONE ;
 }
 
+/////////////////////////Interface FUNCs
+float AWCharacter::GetAimingAlpha() const
+{ // Aim interpolate in future 
+	return bWantsToAim ? 1.0f : 0.0f;
+}
+
+bool AWCharacter::IsCrouching() const
+{
+	return CMC and CMC->IsCrouching();
+}
+bool AWCharacter::IsFalling() const
+{
+	return CMC and CMC->IsFalling();
+}
+
+float AWCharacter::GetMovementSpeed() const
+{
+	return GetVelocity().Size();
+}

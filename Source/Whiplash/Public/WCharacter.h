@@ -11,6 +11,7 @@
 #include "Attributes/FWAttributeModifier.h"
 #include "Attributes/FWDamageEvent.h"
 #include "Tags/WGameplayTags.h"
+#include "Weapons/Interface/IWeapon.h"
 
 
 ////////////////////////////////////////
@@ -27,14 +28,22 @@ class UWAttributeSet;
 class UWStaminaBarWid;
 class UMainHUD;
 UCLASS()
-class WHIPLASH_API AWCharacter : public ACharacter
+class WHIPLASH_API AWCharacter : public ACharacter,public IIWeapon
 {
 	GENERATED_BODY()
 	friend class AWPlayerController;
+	//WeaponInterface
+public:
+	virtual float GetAimingAlpha() const override;
+	virtual bool IsCrouching() const override;
+	virtual bool IsFalling() const override;
+	virtual float GetMovementSpeed() const override;
+	
+	//
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
-UFUNCTION(BlueprintCallable,Category="Tags")
+	UFUNCTION(BlueprintCallable,Category="Tags")
 	void OnTagChanged(FGameplayTag Tag, bool bAdded);
 
 	FTransform DefaultCharacterTransform = FTransform(FRotator(0.0f,-90.0f,0.0f).Quaternion(),

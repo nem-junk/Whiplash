@@ -11,7 +11,7 @@ UWWeaponStateComponent::UWWeaponStateComponent()
 void UWWeaponStateComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-	WCachedPawn = Cast<>
+//	WCachedPawn = Cast<>
 }
 
 void UWWeaponStateComponent::BeginPlay()
