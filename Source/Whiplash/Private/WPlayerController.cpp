@@ -8,6 +8,8 @@
 #include "GameFramework/NavMovementComponent.h"
 #include "Materials/MaterialExpressionLocalPosition.h"
 #include "Tags/WGameplayTags.h"
+#include "Tags/WTagComponent.h"
+
 
 
 
@@ -45,8 +47,15 @@ void AWPlayerController::OnPossess(APawn* InPawn)
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
 	check(Subsystem);
 	Subsystem->AddMappingContext(InputMapping.LoadSynchronous(),InputMappingPriority);
-	
-	WhiplashCharacter = Cast<AWCharacter>(InPawn);
+	if (IWComponentInterface* Provider = Cast<IWComponentInterface>(InPawn)) // Get owner in Player Controller returns GameMode MKC!!!
+	{
+		TagComponent = Provider->GetTagComponent();
+		AbilityComponent = Provider->GetAbilityComponent();
+		if (!AbilityComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("ABILITYCOMPisNULLinPlayerController"));
+		if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TAGCOMPisNULLinPlayerController"));
+	}
+	WhiplashCharacter = Cast<AWCharacter>(InPawn);// on unPossess remove character 
+
 }
 
 FVector2D AWPlayerController::GetMovementInputScaleValue(const FVector2D& Input) const
@@ -198,24 +207,24 @@ void AWPlayerController::OnJumpInputAction(const FInputActionInstance& Instance)
 
 void AWPlayerController::OnCrouchInputActionTriggered(const FInputActionInstance& Instance)
 {
-	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	if (AWCharacter* ControlledPawn = WhiplashCharacter)
 	{
 		if (!ControlledPawn->bDoingTraversalAction)
 		{
-			if (UWAbilityComponent* AbilityComp = ControlledPawn->AbilityComponent)
+			if (AbilityComponent)
 			{
 				if (UCharacterMovementComponent* MoveComp =ControlledPawn->GetCharacterMovement())
 				{
 					if (bIsCrouching)
 					{
-						AbilityComp->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
+						AbilityComponent->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
 						
 						bIsCrouching = false;
 						WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Stopped: %s"),MoveComp->IsCrouching() ?TEXT("true") : TEXT("false"));
 					}
 					else
 					{
-						AbilityComp->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
+						AbilityComponent->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Crouch);
 					
 						bIsCrouching = true;
 						WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Started: %s"),MoveComp->IsCrouching() ?TEXT("true") : TEXT("false"));
@@ -235,7 +244,7 @@ void AWPlayerController::OnCrouchInputActionTriggered(const FInputActionInstance
 
 void AWPlayerController::OnStrafeInputAction(const FInputActionInstance& Instance)
 {
-	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	if (AWCharacter* ControlledPawn = WhiplashCharacter)
 	{
 		ControlledPawn->bWantsToStrafe = !ControlledPawn->bWantsToStrafe;
 	}
@@ -253,12 +262,19 @@ void AWPlayerController::OnPerspectiveInputAction(const FInputActionInstance& In
 void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 {
 	
+	
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
+		
 		ControlledPawn->bWantsToAim = Instance.GetValue().Get<bool>();
 		if (ControlledPawn->bWantsToAim)
-		{
+		{	
+			if (TagComponent)TagComponent->AddTags(WhiplashTags::State_ADS);
 			ControlledPawn->bWantsToStrafe = true;
+		}
+		else if(!ControlledPawn->bWantsToAim)
+		{
+			if (TagComponent)TagComponent->RemoveTags(WhiplashTags::State_ADS);
 		}
 	}
 }

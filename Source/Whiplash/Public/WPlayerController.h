@@ -8,6 +8,7 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Abilities/WAbility.h"
+#include "Interface/WComponentInterface.h"
 /////////////////////////////////////////
 #include "WPlayerController.generated.h"
 /////////////////////////////////////////
@@ -15,6 +16,9 @@
 #define REGISTER_INPUT_ACTION(EnhancedInputComponent,InputAction,TriggerEvent)\
 if(InputAction.IsNull()){WHIPLASH_LOG(LogWhiplash,Error,TEXT("input action property is null!"));}\
 else{EnhancedInputComponent->BindAction(InputAction.LoadSynchronous(),TriggerEvent,this,&AWPlayerController::On##InputAction);}
+
+class UWTagComponent;
+
 
 UCLASS()
 class WHIPLASH_API AWPlayerController : public APlayerController,public IWPlayerControllerInterface
@@ -24,13 +28,21 @@ class WHIPLASH_API AWPlayerController : public APlayerController,public IWPlayer
 	friend class UWAbility;
 public:
 	
-	
+public:
+	FORCEINLINE IWComponentInterface* GetComponentProvider() const 
+	{ 
+		return Cast<IWComponentInterface>(GetPawn()); 
+	}
 	
 protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	UPROPERTY(VisibleInstanceOnly,BlueprintReadOnly,Category="Character")
 	TObjectPtr<class AWCharacter> WhiplashCharacter;
+	UPROPERTY()
+	TObjectPtr<UWTagComponent> TagComponent;
+	UPROPERTY()
+	TObjectPtr<UWAbilityComponent> AbilityComponent;
 	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent;
@@ -106,7 +118,7 @@ protected:
 public:
 	virtual bool IsFullMovementInput_Implementation() const;
 	
-	FORCEINLINE virtual AWCharacter* GetWhiplashCharacter() const {return WhiplashCharacter;}
+	FORCEINLINE  AWCharacter* GetWhiplashCharacter() const {return WhiplashCharacter;}
 	
 	
 	

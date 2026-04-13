@@ -35,7 +35,7 @@ struct FWeaponHandling
 		float InSpreadAngleMultiplier_ADS=0.2f,
 		float InSpreadAngleMultiplier_HipFire=3.5f,
 		float InSpreadAngleMultiplier_Crouch=0.85f,							/*Default Values are from Lyra, will update them in Blueprint*/
-		float InSpreadAngleMultiplier_Moving=1.0f,
+		float InSpreadAngleMultiplier_Moving=1.16670f,
 		float InSpreadAngleMultiplier_Falling=2.0f,
 		float InSpreadAngleAccumulationPerShot=0.098f,
 		float InSpreadAngleAccumulationDecayPerSecond=11.09f):

@@ -12,6 +12,7 @@
 #include "Attributes/FWDamageEvent.h"
 #include "Tags/WGameplayTags.h"
 #include "Weapons/Interface/IWeapon.h"
+#include "Interface/WComponentInterface.h"
 
 
 ////////////////////////////////////////
@@ -28,7 +29,7 @@ class UWAttributeSet;
 class UWStaminaBarWid;
 class UMainHUD;
 UCLASS()
-class WHIPLASH_API AWCharacter : public ACharacter,public IIWeapon
+class WHIPLASH_API AWCharacter : public ACharacter,public IIWeapon, public IWComponentInterface
 {
 	GENERATED_BODY()
 	friend class AWPlayerController;
@@ -38,6 +39,11 @@ public:
 	virtual bool IsCrouching() const override;
 	virtual bool IsFalling() const override;
 	virtual float GetMovementSpeed() const override;
+	//////////////////////////////////////////////
+	virtual UWTagComponent* GetTagComponent() const override { return TagComponent; }
+	virtual UWAbilityComponent* GetAbilityComponent() const override { return AbilityComponent; }
+	virtual UWAttributeSet* GetAttributeSet() const override { return AttributeSet; }
+	//////////////////////////////////////////////
 	
 	//
 protected:
@@ -51,11 +57,11 @@ protected:
 		FVector::OneVector);
 	FTransform DefaultSpringArmTransform = FTransform(FRotator(0.0f,0.0f,0.0f).Quaternion(),FVector(0.0f,0.0f,20.0f),FVector::OneVector);
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Tag")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Tag")
 	TObjectPtr<UWTagComponent> TagComponent;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Ability")
 	TObjectPtr<UWAbilityComponent> AbilityComponent;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="AttributeSet")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="AttributeSet")
 	TObjectPtr<UWAttributeSet> AttributeSet;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

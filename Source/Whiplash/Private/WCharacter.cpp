@@ -35,8 +35,8 @@ AWCharacter::AWCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
-	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent");
-	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent");
+	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent_V2");
+	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent_V2");
 	
 
 	bUseControllerRotationYaw = false;
@@ -184,7 +184,7 @@ void AWCharacter::SetAttributeValues()
 	AttributeSet->OnOutOfStamina.AddUObject(this, &AWCharacter::OnOutOfStamina);
 	AttributeSet->OnStaminaChanged.AddUObject(this, &AWCharacter::OnStaminaChanged);
 	AttributeSet->RegenDelay=1.5;
-	AttributeSet->StaminaDrainMod.Magnitude=StaminaDrainModCh.Magnitude;
+	AttributeSet->StaminaDrainMod.Magnitude= StaminaDrainModCh.Magnitude;
 	AttributeSet->StaminaDrainMod.Duration=StaminaDrainModCh.Duration;
 	AttributeSet->StaminaDrainMod.Interval=StaminaDrainModCh.Interval;
 	AttributeSet->StaminaDrainMod.ModifierOperation=StaminaDrainModCh.ModifierOperation;
@@ -590,6 +590,7 @@ void AWCharacter::UpdateCamera(bool bInterpolate)
 		GetWorld()->DeltaTimeSeconds,TransitionSpeed);
 	SpringArm->SocketOffset = FMath::VInterpTo(SpringArm->SocketOffset,TargetCameraParameters.SocketOffset,
 		GetWorld()->DeltaTimeSeconds,TransitionSpeed);
+
 }
 
 void AWCharacter::UpdateMovement()
@@ -656,7 +657,7 @@ bool AWCharacter::IsCrouching() const
 {
 	return CMC and CMC->IsCrouching();
 }
-bool AWCharacter::IsFalling() const
+bool AWCharacter::IsFalling() const			/*not using these functions since, interface should not be called in tick casting in .ini and then using to get character basic properties */
 {
 	return CMC and CMC->IsFalling();
 }
