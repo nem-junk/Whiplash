@@ -3,9 +3,11 @@
 #include "WCharacter.h"
 #include "Math/UnrealMathUtility.h"
 #include "WCoreTypes.h"
+#include "Animation/InputScaleBias.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapons/Interface/IWeapon.h"
 #include "Interface/WComponentInterface.h"
+#include "Tags/WTagComponent.h"
 
 static const float StandingStillSpeedThreshold = 80.1f;
 //static constexpr float MultiplierNearlyEqualThreshold_Crouch = 0.05f;
@@ -79,11 +81,6 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 		return false;
 	}
 	//check(OwnerPawn);
-	/*bool bIsCrouching = WeaponUser->IsCrouching();
-	bool bIsFalling = WeaponUser->IsFalling();
-	float AimingAlpha = WeaponUser->GetAimingAlpha();*/
-	
-
 	// if Standing still->smoothlyApply
 	float PawnSpeed = OwnerPawn->GetVelocity().Size();
 	const float MovementTargetValue = FMath::GetMappedRangeValueClamped(
@@ -107,19 +104,23 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 	
 	// AimDownSight
 	
+	float AimingAlpha=0.f;
 	
-
+	if (TagComponent) AimingAlpha = TagComponent->HasTag(WhiplashTags::State_ADS) ? 1.f : 0.f;
 	
+	const float AimingMultiplier = FMath::GetMappedRangeValueClamped(
+		FFloatRange(0.f,1.f),
+		FFloatRange(WeaponProperties->WeaponHandling.SpreadAngleMultiplier_HipFire,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_ADS),
+		AimingAlpha
+		) ;
 	
+	const bool bAimingMultiplierAtTarget = FMath::IsNearlyEqual(AimingMultiplier,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_ADS,KINDA_SMALL_NUMBER);
 	
+	//combine all multipliers 
+	const float CombinedMultiplier = AimingMultiplier*CurrentMultiplier_StandingStill*CurrentMultiplier_Crouching*CurrentMultiplier_Falling;
 	
-	return false;
-	/*float TargetMultiplier = FMath::GetMappedRangeValueClamped(InputRange_SSST,OutPutRange_TM,PawnSpeed);
-	CurrentMultiplier_StandingStill = FMath::FInterpTo(CurrentMultiplier_StandingStill,TargetMultiplier,DeltaTime,5.f);
-	bool bStandingStillAtMin = FMath::IsNearlyEqual(CurrentMultiplier_StandingStill,1.f,0.1f);
-	if (bIsCrouching)
-	{
-		
-	}*/
+	AccumulatedSpreadAngleMultiplier = CombinedMultiplier;
+	// need to handle these spread multipliers indicating we are not at min spread ?????????????????
+	return bStandingStillMultiplierAtMin and bCrouchingMultiplierAtTarget and bInAirMultiplierIs1 and bAimingMultiplierAtTarget;
 }
 

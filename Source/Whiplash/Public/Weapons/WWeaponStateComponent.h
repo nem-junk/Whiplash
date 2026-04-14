@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WCharacter.h"
 #include "Components/ActorComponent.h"
 #include "Weapons/WWeaponDA.h"
 
@@ -23,7 +24,16 @@ public:
 	UWWeaponStateComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void InitializeComponent() override;
-
+	
+	UFUNCTION(BlueprintCallable,Category="Weapon|Spread")
+	float GetSpreadAngleMultiplier() const {return bApplyFirstShotAccuracy ? 0 :AccumulatedSpreadAngleMultiplier;}
+	/*returns world time that this weapon was last fired / 0 never fired*/
+	UFUNCTION(BlueprintCallable,Category="Weapon|Timing")
+	float GetLastTimeFired() const {return TimeLastFired;}
+	UFUNCTION(BlueprintCallable,Category="Weapon|Timing")
+	float GetTimeLastEquipped() const {return TimeLastEquipped;}
+	UFUNCTION(BlueprintCallable,Category="Weapon|Ammunition", meta = (DisplayName = "Has 1 in the Chamber? "))
+	bool GetHas1InTheChamber() const {return bHas1InTheChamber;}
 protected:
 	virtual void BeginPlay() override;
 
