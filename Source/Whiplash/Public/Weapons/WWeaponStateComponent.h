@@ -55,6 +55,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool CanReload() const;
+	
+	void Reload();
 
 protected:
 	virtual void BeginPlay() override;

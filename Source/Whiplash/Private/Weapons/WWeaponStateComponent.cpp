@@ -63,6 +63,16 @@ bool UWWeaponStateComponent::CanReload() const
 	
 }
 
+void UWWeaponStateComponent::Reload()
+{
+	if (!WeaponProperties) return;
+	int32 RoundsNeeded = WeaponProperties->Ammunition.MagazineSize - CurrentMagazineAmmo;
+	int32 RoundsToTransfer = FMath::Min(RoundsNeeded,CurrentReserveAmmo);
+	CurrentMagazineAmmo += RoundsToTransfer;
+	CurrentReserveAmmo -= RoundsToTransfer;
+	bHas1InTheChamber = (CurrentMagazineAmmo > 0);
+}
+
 
 void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                            FActorComponentTickFunction* ThisTickFunction)
