@@ -19,7 +19,9 @@ public class Whiplash : ModuleRules
 			"StructUtils",
 			"UMG",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"PhysicsCore",
+			"Engine"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
