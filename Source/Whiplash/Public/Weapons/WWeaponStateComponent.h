@@ -57,6 +57,8 @@ public:
 	bool CanReload() const;
 	
 	void Reload();
+	
+	void EquipWeapon(UWWeaponDA * WeaponDef);
 
 protected:
 	virtual void BeginPlay() override;

@@ -11,6 +11,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Physics/WPhysicalMaterialWithTags.h"
 
+
 static const float StandingStillSpeedThreshold = 80.1f;
 //static constexpr float MultiplierNearlyEqualThreshold_Crouch = 0.05f;
 static const FFloatRange InputRange_SSST = FFloatRange(StandingStillSpeedThreshold, StandingStillSpeedThreshold+20);
@@ -71,6 +72,36 @@ void UWWeaponStateComponent::Reload()
 	CurrentMagazineAmmo += RoundsToTransfer;
 	CurrentReserveAmmo -= RoundsToTransfer;
 	bHas1InTheChamber = (CurrentMagazineAmmo > 0);
+}
+
+void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
+{
+	if (!WeaponDef)
+	{WHIPLASH_LOG(LogWhiplash,Error,TEXT("WeaponDef is null in EquipWeapon"));
+		return;}
+	WeaponProperties = WeaponDef;
+	FireIntervalSeconds = 60.f/ WeaponDef->WeaponHandling.RoundsPerMinute;
+	TimeLastEquipped = GetWorld()->GetTimeSeconds();
+	CurrentMagazineAmmo = WeaponDef->Ammunition.MagazineSize;
+	CurrentReserveAmmo = WeaponDef->Ammunition.MaxReserveAmmo;
+	bHas1InTheChamber = (CurrentMagazineAmmo > 0);
+	AccumulatedSpreadAngle=0.f;
+	AccumulatedSpreadAngleMultiplier=1.f;
+	CurrentMultiplier_StandingStill= CurrentMultiplier_Crouching = CurrentMultiplier_Falling = 1;
+	bApplyFirstShotAccuracy=false;
+	TimeLastFired=0.f;
+	AActor * WeaponMesh = GetWorld()->SpawnActor<AActor>(WeaponDef->Mesh.WeaponMeshClass);
+	USkeletalMeshComponent* CharacterMesh = Cast<ACharacter>(GetOwner())->GetMesh();
+	if (!CharacterMesh || !WeaponMesh)
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("Character mesh is null in WeaponStateCompnent or it could be Weapon Mesh"));
+		return;
+	}
+	WeaponMesh->AttachToComponent(CharacterMesh,FAttachmentTransformRules::SnapToTargetIncludingScale,WeaponDef->Mesh.AttachSocketName);
+	WeaponMesh->SetActorRelativeTransform(WeaponDef->Mesh.AttachSocketTransform);
+	
+	
+	
 }
 
 
