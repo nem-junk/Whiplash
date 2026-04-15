@@ -55,10 +55,14 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool CanReload() const;
+	UFUNCTION(BlueprintCallable)
+	USceneComponent* GetWeaponMeshRootComponent() const;
 	
 	void Reload();
 	
 	void EquipWeapon(UWWeaponDA * WeaponDef);
+	
+	void UnEquipWeapon();
 
 protected:
 	virtual void BeginPlay() override;

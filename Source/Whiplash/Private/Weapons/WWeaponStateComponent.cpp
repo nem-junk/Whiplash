@@ -63,6 +63,11 @@ bool UWWeaponStateComponent::CanReload() const
 	
 }
 
+USceneComponent* UWWeaponStateComponent::GetWeaponMeshRootComponent() const
+{
+	return WeaponMesh ? WeaponMesh->GetRootComponent() : nullptr;
+}
+
 void UWWeaponStateComponent::Reload()
 {
 	if (!WeaponProperties) return;
@@ -80,20 +85,25 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 		return;
 	}
 	WeaponProperties = WeaponDef;
-	float ShotInterval = 60.f / WeaponProperties->WeaponHandling.RoundsPerMinute;
+	float ShotInterval = 60.f / WeaponProperties->WeaponHandling.RoundsPerMinute; // could add a gaurd if RPM is set to 0 fix ?? 
 	CachedDecayThreshold = ShotInterval*1.5f;
 	OutPutRange_TM = FFloatRange(1.f,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_Moving);
 	
-	FireIntervalSeconds = 60.f/ WeaponDef->WeaponHandling.RoundsPerMinute;
+	FireIntervalSeconds = ShotInterval;
 	TimeLastEquipped = GetWorld()->GetTimeSeconds();
 	CurrentMagazineAmmo = WeaponDef->Ammunition.MagazineSize;
 	CurrentReserveAmmo = WeaponDef->Ammunition.MaxReserveAmmo;
 	bHas1InTheChamber = (CurrentMagazineAmmo > 0);
 	AccumulatedSpreadAngle=0.f;
 	AccumulatedSpreadAngleMultiplier=1.f;
-	CurrentMultiplier_StandingStill= CurrentMultiplier_Crouching = CurrentMultiplier_Falling = 1;
+	CurrentMultiplier_StandingStill= CurrentMultiplier_Crouching = CurrentMultiplier_Falling = CurrentMultiplier_ADS =  1.f;
 	bApplyFirstShotAccuracy=false;
 	TimeLastFired=0.f;
+	if (!WeaponDef->Mesh.WeaponMeshClass) 
+	{
+		WHIPLASH_LOG(LogWhiplash, Error, TEXT("WeaponMeshClass is null"));
+		return;
+	}
 	WeaponMesh = GetWorld()->SpawnActor<AActor>(WeaponDef->Mesh.WeaponMeshClass);
 	ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
 	if (!OwnerChar)
@@ -111,6 +121,11 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 	WeaponMesh->SetActorRelativeTransform(WeaponDef->Mesh.AttachSocketTransform);
 
 	
+}
+
+void UWWeaponStateComponent::UnEquipWeapon()
+{
+	if (WeaponMesh) WeaponMesh->Destroy(); WeaponMesh = nullptr;  WeaponProperties = nullptr;
 }
 
 
