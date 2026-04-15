@@ -72,7 +72,7 @@ private:
 	TWeakObjectPtr<UCharacterMovementComponent> WCachedCMC;// remove this can get CMC through character;
 	
 	TObjectPtr<UWWeaponDA> WeaponProperties; // fuckkkkkkkkkkkk!! WeaponProperties have the same name as Struct FWeaponProperties but they both are diff things God help me 
-	TObjectPtr<AActor> Mesh;
+	TObjectPtr<AActor> WeaponMesh;
 	//TScriptInterface<IIWeapon> WeaponUser; // TScriptInterface has an assignment Operator that takes a UObject* and internally calls Owner->GetInterfaceAddress(UWeaponUser::StaticClass())
 	float TimeLastFired = 0;
 	float TimeLastEquipped = 0;
@@ -85,6 +85,7 @@ private:
 	float CurrentMultiplier_StandingStill=1;
 	float CurrentMultiplier_Crouching=1;
 	float CurrentMultiplier_Falling=1;
+	float CurrentMultiplier_ADS = 1.f;
 	
 	FFloatRange OutPutRange_TM;
 	

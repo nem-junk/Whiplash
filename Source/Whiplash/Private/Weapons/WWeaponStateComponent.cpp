@@ -38,9 +38,8 @@ void UWWeaponStateComponent::InitializeComponent()
 void UWWeaponStateComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	float ShotInterval = 60.f / WeaponProperties->WeaponHandling.RoundsPerMinute;
-	CachedDecayThreshold = ShotInterval*1.5f;
-	OutPutRange_TM = FFloatRange(1.f,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_Moving);
+	
+	
 	
 }
 void UWWeaponStateComponent::Fire()
@@ -78,8 +77,13 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 {
 	if (!WeaponDef)
 	{WHIPLASH_LOG(LogWhiplash,Error,TEXT("WeaponDef is null in EquipWeapon"));
-		return;}
+		return;
+	}
 	WeaponProperties = WeaponDef;
+	float ShotInterval = 60.f / WeaponProperties->WeaponHandling.RoundsPerMinute;
+	CachedDecayThreshold = ShotInterval*1.5f;
+	OutPutRange_TM = FFloatRange(1.f,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_Moving);
+	
 	FireIntervalSeconds = 60.f/ WeaponDef->WeaponHandling.RoundsPerMinute;
 	TimeLastEquipped = GetWorld()->GetTimeSeconds();
 	CurrentMagazineAmmo = WeaponDef->Ammunition.MagazineSize;
@@ -90,8 +94,14 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 	CurrentMultiplier_StandingStill= CurrentMultiplier_Crouching = CurrentMultiplier_Falling = 1;
 	bApplyFirstShotAccuracy=false;
 	TimeLastFired=0.f;
-	AActor * WeaponMesh = GetWorld()->SpawnActor<AActor>(WeaponDef->Mesh.WeaponMeshClass);
-	USkeletalMeshComponent* CharacterMesh = Cast<ACharacter>(GetOwner())->GetMesh();
+	WeaponMesh = GetWorld()->SpawnActor<AActor>(WeaponDef->Mesh.WeaponMeshClass);
+	ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
+	if (!OwnerChar)
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("Owner is null in EquipWeapon"));
+		return;
+	}
+	USkeletalMeshComponent* CharacterMesh = OwnerChar->GetMesh();
 	if (!CharacterMesh || !WeaponMesh)
 	{
 		WHIPLASH_LOG(LogWhiplash,Error,TEXT("Character mesh is null in WeaponStateCompnent or it could be Weapon Mesh"));
@@ -99,8 +109,7 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 	}
 	WeaponMesh->AttachToComponent(CharacterMesh,FAttachmentTransformRules::SnapToTargetIncludingScale,WeaponDef->Mesh.AttachSocketName);
 	WeaponMesh->SetActorRelativeTransform(WeaponDef->Mesh.AttachSocketTransform);
-	
-	
+
 	
 }
 
@@ -134,13 +143,11 @@ bool UWWeaponStateComponent::IsSpreadAtMinimum(float DeltaTime)
 
 bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 {
-	if (!OwnerPawn)
+	if (!OwnerPawn || !CMC || !WeaponProperties)
 	{	
 		WHIPLASH_LOG(LogWhiplash,Error,TEXT("OwnerPawnIsNullin_AreMultiplierAtMinimun"));
-		if (!CMC)
-		{
-			WHIPLASH_LOG(LogWhiplash,Error,TEXT("CMCIsNullin_AreMultiplierAtMinimun"));
-		}
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("ORCMCIsNullin_AreMultiplierAtMinimun"));
+		
 		return false;
 	}
 	//check(OwnerPawn);
@@ -167,20 +174,17 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 	
 	// AimDownSight
 	
-	float AimingAlpha=0.f;
+	float AimingAlpha= (TagComponent && TagComponent->HasTag(WhiplashTags::State_ADS)) ? 1.f : 0.f;
 	
-	if (TagComponent) AimingAlpha = TagComponent->HasTag(WhiplashTags::State_ADS) ? 1.f : 0.f;
-	
-	const float AimingMultiplier = FMath::GetMappedRangeValueClamped(
-		FFloatRange(0.f,1.f),
+	const float TargetADSMultiplier = FMath::GetMappedRangeValueClamped(FFloatRange(0.f,1.f),
 		FFloatRange(WeaponProperties->WeaponHandling.SpreadAngleMultiplier_HipFire,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_ADS),
-		AimingAlpha
-		) ;
+		AimingAlpha);
+	CurrentMultiplier_ADS = FMath::FInterpTo(CurrentMultiplier_ADS,TargetADSMultiplier,DeltaTime,5); // this was mising 
 	
-	const bool bAimingMultiplierAtTarget = FMath::IsNearlyEqual(AimingMultiplier,WeaponProperties->WeaponHandling.SpreadAngleMultiplier_ADS,KINDA_SMALL_NUMBER);
+	const bool bAimingMultiplierAtTarget = FMath::IsNearlyEqual(CurrentMultiplier_ADS,TargetADSMultiplier,KINDA_SMALL_NUMBER);
 	
 	//combine all multipliers 
-	const float CombinedMultiplier = AimingMultiplier*CurrentMultiplier_StandingStill*CurrentMultiplier_Crouching*CurrentMultiplier_Falling;
+	const float CombinedMultiplier = CurrentMultiplier_ADS*CurrentMultiplier_StandingStill*CurrentMultiplier_Crouching*CurrentMultiplier_Falling;
 	
 	AccumulatedSpreadAngleMultiplier = CombinedMultiplier;
 	// need to handle these spread multipliers indicating we are not at min spread ?????????????????
@@ -191,6 +195,7 @@ float UWWeaponStateComponent::GetDistanceAttenuation(float Distance) const
 {
 	if (!WeaponProperties) return 1.0f;
 	const FRichCurve* Curve =  WeaponProperties->DistanceDamageFallOff.GetRichCurveConst();
+	if (Curve == nullptr) return 1.0f;
 	return Curve->HasAnyData() ? Curve->Eval(Distance) : 1.f;
 }
 
