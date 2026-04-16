@@ -33,7 +33,18 @@ void UWWeaponStateComponent::InitializeComponent()
 		if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TagComponentisNULLinWeaponInstance"));
 	}
 }
-
+void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+										   FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (!WeaponProperties)return;
+	const bool bMinSpread=IsSpreadAtMinimum(DeltaTime);
+	const bool bMinMultipliers=AreMultipliersAtMinimum(DeltaTime);
+	bApplyFirstShotAccuracy= WeaponProperties->bHasFirstShotAccuracy and bMinMultipliers and bMinSpread;
+	IsSpreadAtMinimum(DeltaTime);
+	AreMultipliersAtMinimum(DeltaTime);
+	
+}
 
 void UWWeaponStateComponent::BeginPlay()
 {
@@ -129,18 +140,7 @@ void UWWeaponStateComponent::UnEquipWeapon()
 }
 
 
-void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                           FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (!WeaponProperties)return;
-	bMinSpread=IsSpreadAtMinimum(DeltaTime);
-	bMinMultipliers=AreMultipliersAtMinimum(DeltaTime);
-	bApplyFirstShotAccuracy= WeaponProperties->bHasFirstShotAccuracy and bMinMultipliers and bMinSpread;
-	IsSpreadAtMinimum(DeltaTime);
-	AreMultipliersAtMinimum(DeltaTime);
-	
-}
+
 
 
 bool UWWeaponStateComponent::IsSpreadAtMinimum(float DeltaTime)

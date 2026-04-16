@@ -97,8 +97,8 @@ private:
 	const float /*Cached*/MultiplierNearlyEqualThreshold = 5.f; // this 
 	
 	float FireIntervalSeconds =0;//calculated once in EquipWeapon as 60.0/sec also in CanFire fucntion when implmented 
-	bool  bMinSpread=false;
-	bool  bMinMultipliers=false;
+	/*bool  bMinSpread=false;
+	bool  bMinMultipliers=false;*/
 	
 	
 	
