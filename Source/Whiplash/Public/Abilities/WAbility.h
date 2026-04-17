@@ -55,6 +55,10 @@ public:
 
 protected:
 	UPROPERTY()
+	TObjectPtr<APawn> OwnerPawn;
+	UPROPERTY()
+	TObjectPtr<APlayerController> OwnerController;
+	UPROPERTY()
 	UWAbilityComponent* AbilityComponent;
 	UPROPERTY()
 	UWTagComponent* TagComponent;

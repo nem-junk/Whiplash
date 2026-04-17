@@ -24,6 +24,11 @@ bool UWAbility::CanStart_Implementation(AActor* Instigator)
 void UWAbility::StartAbility_Implementation(AActor* Instigator)
 {
 	UWAbilityComponent* AbilityComp = GetOwningComponent();
+	if (AbilityComp)
+	{
+		OwnerPawn = Cast<APawn>(AbilityComp->GetOwner());	
+	}
+	
 	
 	if (TagComponent)
 	{

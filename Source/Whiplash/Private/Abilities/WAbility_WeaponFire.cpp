@@ -8,6 +8,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "Weapons/Interface/IWeapon.h"
 
 
 
@@ -21,8 +22,100 @@ UWAbility_WeaponFire::UWAbility_WeaponFire()
 	
 }
 
-bool UWAbility_WeaponFire::CanStart_Implementation_Implementation(AActor* Instigator)
+bool UWAbility_WeaponFire::CanStart_Implementation(AActor* Instigator)
 {
 	if (!Super::CanStart_Implementation(Instigator)) return false;
+	IIWeapon*WeaponOwner = Cast<IIWeapon>(Instigator);
+	if (!WeaponOwner) return false;
+	UWWeaponStateComponent*WeaponState = WeaponOwner->GetWeaponState();
+	if (!WeaponState) return false;
+	CachedWeaponState = WeaponState;
+	return WeaponState->CanFire(); 
+	
+}
 
+void UWAbility_WeaponFire::StartAbility_Implementation(AActor* Instigator)
+{
+	Super::StartAbility_Implementation(Instigator);
+	if (!CachedWeaponState)
+	{
+		StopAbility(nullptr);
+		return;
+	}
+	bIsFirstShot = true;
+	if (TagComponent)
+	{
+		TagComponent->AddTags(WhiplashTags::State_Firing);
+		FireOnce();
+		if (!CachedWeaponState) return;
+		if(CachedWeaponState->GetWeaponDA()->Ammunition.bIsAutomatic)
+		{
+			GetWorld()->GetTimerManager().SetTimer(FireLoopTimerHandle,
+				this, &UWAbility_WeaponFire::FireOnce,
+				60.f/CachedWeaponState->GetWeaponDA()->WeaponHandling.RoundsPerMinute,
+				true);
+		}
+		else
+		{
+			TWeakObjectPtr<UWAbility_WeaponFire> WeakThis(this);
+			GetWorld()->GetTimerManager().SetTimerForNextTick(
+				[WeakThis](){if (WeakThis.IsValid()) WeakThis->StopAbility(nullptr);}
+				);
+		}
+	}
+	
+}
+
+void UWAbility_WeaponFire::StopAbility_Implementation(AActor* Instigator)
+{
+	Super::StopAbility_Implementation(Instigator);
+}
+
+void UWAbility_WeaponFire::FireOnce()
+{
+	if (!CachedWeaponState || !CachedWeaponState->CanFire())
+	{
+		StopAbility(nullptr);
+		return;
+	}
+	CachedWeaponState->Fire();
+	const UWWeaponDA* WeaponDA = CachedWeaponState->GetWeaponDA();
+	if (!WeaponDA || !OwnerPawn)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("WeaponDA||OwnerPawn null"));
+		return;
+	}
+	// tu he tho sab thi, tu he tho sab hai 
+	// kab se mai tera ho kab se tu meri laila 
+	FVector AimTarget = GetAimTargetPoint();
+	USceneComponent* MuzzleRoot = CachedWeaponState->GetWeaponMeshRootComponent();
+	if (!MuzzleRoot)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("MuzzleRoot null"));
+		return;
+	}
+	FVector MuzzleLocation = MuzzleRoot->GetSocketLocation(MuzzleSocketName);
+	FVector BaseDirection = (AimTarget - MuzzleLocation).GetSafeNormal();
+	FRotator SpreadRot = GetSpreadRotation();
+	FVector FinalDirection = SpreadRot.RotateVector(BaseDirection);
+	FHitResult HitResult;
+	FVector TraceEnd = MuzzleLocation + FinalDirection * WeaponDA->MaxDamageRange;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(OwnerPawn);
+	if (WeaponDA->BulletTraceSweepRadius > 0)
+	{
+		GetWorld()->SweepSingleByChannel(HitResult,
+			MuzzleLocation,
+			TraceEnd,
+			FQuat::Identity,
+			ECC_Visibility,
+			FCollisionShape::MakeSphere(WeaponDA->BulletTraceSweepRadius),Params);
+	}
+	else
+	{
+		GetWorld()->LineTraceSingleByChannel(HitResult,
+			MuzzleLocation,
+			TraceEnd,
+			ECC_Visibility,Params);
+	}
 }

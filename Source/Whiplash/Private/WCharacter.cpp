@@ -650,6 +650,7 @@ float AWCharacter::CalculateMaxSpeed() const
 }
 
 /////////////////////////Interface FUNCs
+///
 float AWCharacter::GetAimingAlpha() const
 { // Aim interpolate in future 
 	return bWantsToAim ? 1.0f : 0.0f;
@@ -668,3 +669,23 @@ float AWCharacter::GetMovementSpeed() const
 {
 	return GetVelocity().Size();
 }
+
+UWWeaponStateComponent* AWCharacter::GetWeaponState() const
+{
+	return WeaponStateComp;
+}
+
+UWTagComponent* AWCharacter::GetTagComp() const
+{
+	if (TagComponent)
+	{
+		return TagComponent;
+	}
+	else
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("Tag comp is null in GetTagComp()"));
+		return nullptr;
+	}
+	
+}
+

@@ -40,6 +40,8 @@ public:
 	virtual bool IsCrouching() const override;
 	virtual bool IsFalling() const override;
 	virtual float GetMovementSpeed() const override;
+	virtual UWWeaponStateComponent* GetWeaponState() const override;
+	virtual UWTagComponent* GetTagComp() const override;
 	//////////////////////////////////////////////
 	virtual UWTagComponent* GetTagComponent() const override { return TagComponent; }
 	virtual UWAbilityComponent* GetAbilityComponent() const override { return AbilityComponent; }

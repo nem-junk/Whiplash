@@ -6,6 +6,7 @@
 #include "IWeapon.generated.h"
 
 class UWWeaponStateComponent;
+class UWTagComponent;
 
 UINTERFACE(MinimalAPI,Blueprintable)
 class UIWeapon : public UInterface
@@ -25,6 +26,7 @@ public:
 	
 	
 	virtual UWWeaponStateComponent* GetWeaponState() const =0;
+	virtual UWTagComponent* GetTagComp() const =0;
 
 
 };
