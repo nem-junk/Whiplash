@@ -43,6 +43,16 @@ public:
 	FWeaponMesh Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon|Properties")
 	FWeaponUI UI;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Specs")
+	bool bIsSuppressed = true;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Specs",
+		meta = (EditCondition = "bIsSuppressed",EditConditionHides))
+	float SuppressedSoundRadius = 500.f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Specs",
+		meta = (EditCondition = "!bIsSuppressed",EditConditionHides))
+	float UnSuppressedSoundRadius = 3000.f;
+	
 
 
 public:

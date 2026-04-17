@@ -40,7 +40,8 @@ public:
     float GetSpreadAngleMultiplier() const {return bApplyFirstShotAccuracy ? 0 :AccumulatedSpreadAngleMultiplier;}
     UFUNCTION(BlueprintCallable,Category="Weapon|Spread")
 	bool HasFirstShotAccuracy() const {return bApplyFirstShotAccuracy;}
-
+	UFUNCTION(BlueprintCallable,Category="Weapon")
+	const UWWeaponDA* GetWeaponDA() const {return WeaponProperties;}
 	// returns a multiplier between 0||1 based on  the distance from the Target
 	UFUNCTION(BlueprintCallable)
 	virtual float GetDistanceAttenuation(float Distance) const;

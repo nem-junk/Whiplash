@@ -41,8 +41,6 @@ void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	const bool bMinSpread=IsSpreadAtMinimum(DeltaTime);
 	const bool bMinMultipliers=AreMultipliersAtMinimum(DeltaTime);
 	bApplyFirstShotAccuracy= WeaponProperties->bHasFirstShotAccuracy and bMinMultipliers and bMinSpread;
-	IsSpreadAtMinimum(DeltaTime);
-	AreMultipliersAtMinimum(DeltaTime);
 	
 }
 
@@ -136,7 +134,12 @@ void UWWeaponStateComponent::EquipWeapon(UWWeaponDA* WeaponDef)
 
 void UWWeaponStateComponent::UnEquipWeapon()
 {
-	if (WeaponMesh) WeaponMesh->Destroy(); WeaponMesh = nullptr;  WeaponProperties = nullptr;
+	if (WeaponMesh)
+	{
+		WeaponMesh->Destroy();
+		WeaponMesh = nullptr;
+	}
+	WeaponProperties = nullptr;
 }
 
 

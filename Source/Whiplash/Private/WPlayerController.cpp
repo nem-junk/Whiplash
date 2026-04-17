@@ -270,11 +270,13 @@ void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 		if (ControlledPawn->bWantsToAim)
 		{	
 			if (TagComponent)TagComponent->AddTags(WhiplashTags::State_ADS);
+			
 			ControlledPawn->bWantsToStrafe = true;
 		}
 		else if(!ControlledPawn->bWantsToAim)
 		{
 			if (TagComponent)TagComponent->RemoveTags(WhiplashTags::State_ADS);
+			
 		}
 	}
 }

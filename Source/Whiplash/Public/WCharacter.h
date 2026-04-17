@@ -28,6 +28,7 @@ class UWTagComponent;
 class UWAttributeSet;
 class UWStaminaBarWid;
 class UMainHUD;
+class UWWeaponStateComponent;
 UCLASS()
 class WHIPLASH_API AWCharacter : public ACharacter,public IIWeapon, public IWComponentInterface
 {
@@ -63,6 +64,8 @@ protected:
 	TObjectPtr<UWAbilityComponent> AbilityComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="AttributeSet")
 	TObjectPtr<UWAttributeSet> AttributeSet;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon")
+	TObjectPtr<UWWeaponStateComponent> WeaponStateComp;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCharacterMovementComponent> CMC;

@@ -20,6 +20,7 @@
 #include "BFL/WDamageHelper.h"
 #include "UI/WStaminaBarWid.h"
 #include "UI/MainHUD.h"
+#include "Weapons/WWeaponStateComponent.h"
 /*WHIPLASH_LOG(LogWhiplashAbility, Error, TEXT("StaminaRegenMod -> Mag: %f, Dur: %f, Int: %f, Op: %d, Target: %d, ID: %s"), 
 AttributeSet->StaminaDrainMod.Magnitude, 
 AttributeSet->StaminaDrainMod.Duration, 
@@ -37,6 +38,7 @@ AWCharacter::AWCharacter()
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent_V2");
 	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent_V2");
+	WeaponStateComp = CreateDefaultSubobject<UWWeaponStateComponent>("WeaponStateComponent");
 	
 
 	bUseControllerRotationYaw = false;
