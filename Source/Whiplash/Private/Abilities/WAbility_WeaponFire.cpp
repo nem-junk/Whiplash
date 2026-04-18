@@ -118,4 +118,56 @@ void UWAbility_WeaponFire::FireOnce()
 			TraceEnd,
 			ECC_Visibility,Params);
 	}
+#if !UE_BUILD_SHIPPING
+	DrawDebugLine(GetWorld(),MuzzleLocation,
+		HitResult.bBlockingHit ? HitResult.ImpactPoint : TraceEnd,
+		HitResult.bBlockingHit ? FColor::Red : FColor::Green,
+		false,1.f,0,1.f);
+	if (HitResult.bBlockingHit)
+	{
+		DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,5.f,8,FColor::Red,1.f);
+	}
+#endif
+	
+}
+
+FVector UWAbility_WeaponFire::GetAimTargetPoint() const
+{
+	if (!OwnerPawn)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("OwnerPawn null GetAimTargetPoint"));
+		return FVector::ZeroVector;
+	}
+	AController* PC = OwnerPawn->GetController();
+	if (!PC)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("PC null"));
+		return FVector::ZeroVector;
+	}
+	FVector ViewLocation ;
+	FRotator ViewRotation ;
+	PC->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	if (!CachedWeaponState)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("weaponstate null in Get aim Target Point"));
+		return FVector::ZeroVector;
+	}
+	FVector TraceEnd = ViewLocation + ViewRotation.Vector()*CachedWeaponState->GetWeaponDA()->MaxDamageRange;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(OwnerPawn);
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult,
+		ViewLocation,TraceEnd,
+		ECC_Visibility,Params);
+	return HitResult.bBlockingHit ? HitResult.ImpactPoint : TraceEnd;
+	
+}
+
+FRotator UWAbility_WeaponFire::GetSpreadRotation() const
+{
+	if (!CachedWeaponState || CachedWeaponState->HasFirstShotAccuracy()) return FRotator::ZeroRotator;
+	float HalfCone = CachedWeaponState->GetSpreadAngle()* CachedWeaponState->GetSpreadAngleMultiplier();
+	float Pitch = FMath::RandRange(-HalfCone,HalfCone);
+	float Yaw = FMath::RandRange(-HalfCone,HalfCone);
+	return FRotator(Pitch,Yaw,0);
 }
