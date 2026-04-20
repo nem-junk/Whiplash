@@ -18,7 +18,7 @@ public:
 	
 	virtual void StopAbility_Implementation(AActor* Instigator) override;
 public:
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="WeaponSocketName")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="WeaponSocketName")
 	FName MuzzleSocketName = FName("Muzzle");
 private:
 	void FireOnce();

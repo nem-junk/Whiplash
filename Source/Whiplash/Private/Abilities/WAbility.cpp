@@ -27,6 +27,7 @@ void UWAbility::StartAbility_Implementation(AActor* Instigator)
 	if (AbilityComp)
 	{
 		OwnerPawn = Cast<APawn>(AbilityComp->GetOwner());	// find a way to not have a cast here ;
+	
 	}
 	
 	

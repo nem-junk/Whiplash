@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Weapons/Interface/IWeapon.h"
+#include "DrawDebugHelpers.h"
 
 
 
@@ -68,6 +69,18 @@ void UWAbility_WeaponFire::StartAbility_Implementation(AActor* Instigator)
 
 void UWAbility_WeaponFire::StopAbility_Implementation(AActor* Instigator)
 {
+	if (FireLoopTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireLoopTimerHandle);
+	}
+	if (TagComponent)
+	{
+		TagComponent->RemoveTags(WhiplashTags::State_Firing);
+	}
+	bIsFirstShot = true;
+	CachedWeaponState = nullptr;
+	
+	
 	Super::StopAbility_Implementation(Instigator);
 }
 
@@ -128,7 +141,26 @@ void UWAbility_WeaponFire::FireOnce()
 		DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,5.f,8,FColor::Red,1.f);
 	}
 #endif
-	
+	if (APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController()))
+	{
+		float Pitch = WeaponDA->WeaponRecoil.RecoilPitch * FMath::RandRange(0.9f,1.f);
+		float Yaw = FMath::RandRange(WeaponDA->WeaponRecoil.RecoilYawMin,WeaponDA->WeaponRecoil.RecoilYawMax);
+		if (bIsFirstShot)
+		{
+			Pitch*=WeaponDA->WeaponRecoil.FirstShotRecoilMultiplier;
+			Yaw*=WeaponDA->WeaponRecoil.FirstShotRecoilMultiplier;
+			bIsFirstShot=false;
+		}
+		PC->AddPitchInput(-Pitch);
+		PC->AddYawInput(Yaw);
+	}
+	if (WeaponDA->Mesh.FireMontage)
+	{
+		if (ACharacter* Owner = Cast<ACharacter>(OwnerPawn))
+		{
+			Owner->PlayAnimMontage(WeaponDA->Mesh.FireMontage);
+		}
+	}
 }
 
 FVector UWAbility_WeaponFire::GetAimTargetPoint() const
@@ -149,7 +181,7 @@ FVector UWAbility_WeaponFire::GetAimTargetPoint() const
 	PC->GetPlayerViewPoint(ViewLocation, ViewRotation);
 	if (!CachedWeaponState)
 	{
-		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("weaponstate null in Get aim Target Point"));
+		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("Weapon State null in Get aim Target Point"));
 		return FVector::ZeroVector;
 	}
 	FVector TraceEnd = ViewLocation + ViewRotation.Vector()*CachedWeaponState->GetWeaponDA()->MaxDamageRange;
