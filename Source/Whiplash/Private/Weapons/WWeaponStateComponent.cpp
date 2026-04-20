@@ -19,7 +19,7 @@ static const FFloatRange InputRange_SSST = FFloatRange(StandingStillSpeedThresho
 UWWeaponStateComponent::UWWeaponStateComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	bWantsInitializeComponent = true;
 }
 void UWWeaponStateComponent::InitializeComponent()
 {
@@ -47,6 +47,11 @@ void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 void UWWeaponStateComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!CMC)
+	{
+		
+	}
+		
 	
 	
 	
@@ -161,9 +166,20 @@ bool UWWeaponStateComponent::IsSpreadAtMinimum(float DeltaTime)
 
 bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 {
-	if (!OwnerPawn || !CMC || !WeaponProperties)
-	{	
+	
+	if (!OwnerPawn)
+	{
 		WHIPLASH_LOG(LogWhiplash,Error,TEXT("OwnerPawnIsNullin_AreMultiplierAtMinimun"));
+		return false;
+	}
+	if ( !WeaponProperties)
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("WeaponProperties is null in AreMultipliersAtMinimum"));
+		return false;
+	}
+	if ( !CMC )
+	{	
+		
 		WHIPLASH_LOG(LogWhiplash,Error,TEXT("ORCMCIsNullin_AreMultiplierAtMinimun"));
 		
 		return false;

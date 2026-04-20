@@ -32,6 +32,8 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,PerspectiveInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,AimInputAction,ETriggerEvent::Triggered);
 	
+	REGISTER_INPUT_ACTION(EnhancedInputComponent,ShootInputActionTriggered,ETriggerEvent::Triggered);
+	
 }
 
 void AWPlayerController::OnPossess(APawn* InPawn)
@@ -278,5 +280,33 @@ void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 			if (TagComponent)TagComponent->RemoveTags(WhiplashTags::State_ADS);
 			
 		}
+	}
+}
+
+void AWPlayerController::OnShootInputActionTriggered(const FInputActionInstance& Instance)
+{
+	if (Instance.GetValue().Get<bool>())
+	{
+		OnShootPressed();
+	}
+	else
+	{
+		OnShootReleased();
+	}
+}
+
+void AWPlayerController::OnShootPressed()
+{
+	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	{
+		ControlledPawn->GetAbilityComponent()->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Shoot);
+	}
+}
+
+void AWPlayerController::OnShootReleased()
+{
+	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	{
+		ControlledPawn->GetAbilityComponent()->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Shoot);
 	}
 }

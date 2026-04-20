@@ -36,8 +36,8 @@ AWCharacter::AWCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
-	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent_V2");
-	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent_V2");
+	TagComponent = CreateDefaultSubobject<UWTagComponent>("TagComponent");
+	AbilityComponent = CreateDefaultSubobject<UWAbilityComponent>("AbilityComponent");
 	WeaponStateComp = CreateDefaultSubobject<UWWeaponStateComponent>("WeaponStateComponent");
 	
 

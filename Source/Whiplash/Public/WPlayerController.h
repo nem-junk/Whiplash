@@ -70,6 +70,8 @@ protected:
 	TSoftObjectPtr<UInputAction> JumpInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> CrouchInputActionTriggered;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category="Input|Action|Weapon")
+	TSoftObjectPtr<UInputAction> ShootInputActionTriggered;
 	  
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
@@ -114,7 +116,11 @@ protected:
 	UFUNCTION()
 	virtual void OnAimInputAction(const FInputActionInstance& Instance);
 	
-
+	UFUNCTION()
+	virtual void OnShootInputActionTriggered(const FInputActionInstance& Instance);
+	
+	void OnShootPressed();
+	void OnShootReleased();
 public:
 	virtual bool IsFullMovementInput_Implementation() const;
 	

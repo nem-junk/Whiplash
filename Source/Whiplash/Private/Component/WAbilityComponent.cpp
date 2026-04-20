@@ -19,7 +19,7 @@ void UWAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	TagComponent = GetOwner()->FindComponentByClass<UWTagComponent>();
-	//if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
+	if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
 	for (TSubclassOf<UWAbility> AbilityClass : DefaultAbilities)
 	{
 		AddAbility(GetOwner(), AbilityClass);
@@ -46,7 +46,7 @@ void UWAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UWAbility> A
 		Abilities.Add(NewAbility);
 		if (NewAbility->bAutoStart && ensure(NewAbility->CanStart(Instigator)))
 		{
-			// NewAbility->StartAction(Instigator);
+			NewAbility->StartAbility(Instigator);
 		}
 	}
 }
@@ -76,7 +76,7 @@ bool UWAbilityComponent::StartAbilityByTag(AActor* Instigator, FGameplayTag Abil
 		
 			if (!Ability->CanStart(Instigator))
 			{
-				FString FailedMsg = FString::Printf(TEXT("CanStart is false: %s"),*AbilityName.ToString());
+				WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("CanStart is false: %s"), *AbilityName.ToString());
 				continue;
 			}
 			// run the ability here when replicated ServerStartAction maybe 
