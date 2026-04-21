@@ -47,8 +47,15 @@ public:
 	virtual UWAbilityComponent* GetAbilityComponent() const override { return AbilityComponent; }
 	virtual UWAttributeSet* GetAttributeSet() const override { return AttributeSet; }
 	//////////////////////////////////////////////
-	
-	//
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Animation")
+	bool bPistolEquipped = false;														/*these values will be used by ABP_WCharacter to set the overlayPose*/
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Animation")
+	bool bPistolAiming = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Animation")						/* after testing of Weapon -> add these values to DA or F*/
+	bool bPistolFiring = false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Animation")
+	bool PistolOverlayAlpha = false;
+	/////////////////////////////////////////////
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;

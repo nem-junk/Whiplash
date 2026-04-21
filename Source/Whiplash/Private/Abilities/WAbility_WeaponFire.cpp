@@ -46,6 +46,7 @@ void UWAbility_WeaponFire::StartAbility_Implementation(AActor* Instigator)
 	bIsFirstShot = true;
 	if (TagComponent)
 	{
+		//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("in TC next will be to add State_Firing"));
 		TagComponent->AddTags(WhiplashTags::State_Firing);
 		FireOnce();
 		if (!CachedWeaponState) return;

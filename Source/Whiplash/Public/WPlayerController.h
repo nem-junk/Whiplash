@@ -121,6 +121,8 @@ protected:
 	
 	void OnShootPressed();
 	void OnShootReleased();
+	
+	bool bSavedWantsToStrafe = false;
 public:
 	virtual bool IsFullMovementInput_Implementation() const;
 	
