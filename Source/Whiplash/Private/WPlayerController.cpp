@@ -278,12 +278,19 @@ void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 			}
 			bSavedWantsToStrafe = ControlledPawn->bWantsToStrafe;
 			ControlledPawn->bWantsToStrafe = true;
+			if (ControlledPawn->CMC)
+			{
+				//ControlledPawn->CMC->RotationRate = FRotator(0.f,720.f,0.f);
+			}
 		}
 		else if(!ControlledPawn->bWantsToAim)
 		{
 			if (TagComponent)TagComponent->RemoveTags(WhiplashTags::State_ADS);
 			ControlledPawn->bWantsToStrafe = bSavedWantsToStrafe;
-			
+			if (ControlledPawn->CMC)
+			{
+				//ControlledPawn->CMC->RotationRate = FRotator(0.f,360.f,0.f);
+			}
 		}
 	}
 }

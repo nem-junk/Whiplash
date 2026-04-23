@@ -608,9 +608,23 @@ void AWCharacter::UpdateRotation()
 {
 	if (CMC)
 	{
-		CMC->bUseControllerDesiredRotation = bWantsFirstPerson || bWantsToStrafe ;
-		CMC->bOrientRotationToMovement = !bWantsFirstPerson && !bWantsToStrafe;
-		CMC->RotationRate = CMC->IsFalling() ? (bWantsFirstPerson ? FirstPersonFallingRotationRate : ThirdPersonFallingRotationRate) : (bWantsFirstPerson ? FirstPersonNotFallingRotationRate : ThirdPersonNotFallingRotationRate);
+		const bool bUseControlledFacing = bWantsFirstPerson || bWantsToStrafe || bWantsToWalk;
+		CMC->bUseControllerDesiredRotation = bUseControlledFacing;
+		CMC->bOrientRotationToMovement = !bUseControlledFacing;
+		//CMC->bUseControllerDesiredRotation = bWantsFirstPerson || bWantsToStrafe ;
+		//CMC->bOrientRotationToMovement = !bWantsFirstPerson && !bWantsToStrafe;
+		if (bWantsToAim)
+		{
+			//CMC->RotationRate = FRotator ( 0.f,720.f,0.f );
+			//WHIPLASH_LOG(LogWhiplash,Error,TEXT("bWantsToAim %s"),bWantsToAim ?TEXT("true"): TEXT("false"));
+			FRotator NewRotation = FRotator(0,GetControlRotation().Yaw,0.f	);
+			SetActorRotation(NewRotation);
+		}
+		else 
+		{
+			CMC->RotationRate = CMC->IsFalling() ? (bWantsFirstPerson ? FirstPersonFallingRotationRate : ThirdPersonFallingRotationRate) : (bWantsFirstPerson ? FirstPersonNotFallingRotationRate : ThirdPersonNotFallingRotationRate );
+		}
+		//CMC->RotationRate = CMC->IsFalling() ? (bWantsFirstPerson ? FirstPersonFallingRotationRate : ThirdPersonFallingRotationRate) : (bWantsFirstPerson ? FirstPersonNotFallingRotationRate : ThirdPersonNotFallingRotationRate);
 	}
 }
 
