@@ -9,6 +9,8 @@
 #include "Materials/MaterialExpressionLocalPosition.h"
 #include "Tags/WGameplayTags.h"
 #include "Tags/WTagComponent.h"
+#include "Weapons/WWeaponStateComponent.h"
+#include "Weapons/Interface/IFlashLight.h"
 
 
 
@@ -33,6 +35,7 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,AimInputAction,ETriggerEvent::Triggered);
 	
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,ShootInputActionTriggered,ETriggerEvent::Triggered);
+	REGISTER_INPUT_ACTION(EnhancedInputComponent,ToggleFlashLightInputAction,ETriggerEvent::Started);
 	
 }
 
@@ -305,6 +308,26 @@ void AWPlayerController::OnShootInputActionTriggered(const FInputActionInstance&
 	{
 		OnShootReleased();
 	}
+}
+
+void AWPlayerController::OnToggleFlashLightInputAction(const FInputActionInstance& Instance)
+{
+	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	{
+		UWWeaponStateComponent* State = ControlledPawn->WeaponStateComp;
+		if (!State)
+		{
+			WHIPLASH_LOG(LogWhiplash,Error,TEXT("State is null"));
+			return;
+		}
+		AActor* Weapon = State->WeaponMesh;
+		if (!Weapon || !Weapon->Implements<UIFlashLight>()) return;
+		IIFlashLight::Execute_ToggleFlashLight(Weapon);
+		
+			
+		
+	}
+	
 }
 
 void AWPlayerController::OnShootPressed()

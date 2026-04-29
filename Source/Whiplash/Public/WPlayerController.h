@@ -72,6 +72,8 @@ protected:
 	TSoftObjectPtr<UInputAction> CrouchInputActionTriggered;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category="Input|Action|Weapon")
 	TSoftObjectPtr<UInputAction> ShootInputActionTriggered;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Input|Action|FlashLight")
+	TSoftObjectPtr<UInputAction> ToggleFlashLightInputAction;
 	  
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
@@ -118,7 +120,8 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnShootInputActionTriggered(const FInputActionInstance& Instance);
-	
+	UFUNCTION()
+	virtual void OnToggleFlashLightInputAction(const FInputActionInstance& Instance);
 	void OnShootPressed();
 	void OnShootReleased();
 	

@@ -108,8 +108,24 @@ void UWAbility_WeaponFire::FireOnce()
 		WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("MuzzleRoot null"));
 		return;
 	}
-	FVector MuzzleLocation = MuzzleRoot->GetSocketLocation(MuzzleSocketName);
-	FVector BaseDirection = (AimTarget - MuzzleLocation).GetSafeNormal();
+	USkeletalMeshComponent*SKM = nullptr;
+	TArray<USceneComponent*> Children;
+	MuzzleRoot->GetChildrenComponents(false,Children);
+	for (USceneComponent* Child : Children)
+	{
+		SKM = Cast<USkeletalMeshComponent>(Child);
+		if (SKM) break;
+	}
+	if (!SKM)
+	{
+		WHIPLASH_LOG(LogWhiplash,Error,TEXT("SKM null"));
+		return;
+	}
+	FTransform MuzzleTransform = SKM->GetSocketTransform(MuzzleSocketName);
+	//FVector MuzzleLocation = SKM->GetSocketLocation(MuzzleSocketName);
+	FVector MuzzleLocation = MuzzleTransform.GetLocation();
+	//FVector BaseDirection = (AimTarget - MuzzleLocation).GetSafeNormal();
+	FVector BaseDirection = MuzzleTransform.GetRotation().GetForwardVector();
 	FRotator SpreadRot = GetSpreadRotation();
 	FVector FinalDirection = SpreadRot.RotateVector(BaseDirection);
 	FHitResult HitResult;

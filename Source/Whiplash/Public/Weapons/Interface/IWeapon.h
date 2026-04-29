@@ -27,6 +27,8 @@ public:
 	
 	virtual UWWeaponStateComponent* GetWeaponState() const =0;
 	virtual UWTagComponent* GetTagComp() const =0;
+	
+
 
 
 };

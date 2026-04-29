@@ -80,6 +80,7 @@ bool UWWeaponStateComponent::CanReload() const
 USceneComponent* UWWeaponStateComponent::GetWeaponMeshRootComponent() const
 {
 	return WeaponMesh ? WeaponMesh->GetRootComponent() : nullptr;
+	
 }
 
 void UWWeaponStateComponent::Reload()
