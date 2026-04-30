@@ -64,6 +64,7 @@ public:
 	void EquipWeapon(UWWeaponDA * WeaponDef);
 	
 	void UnEquipWeapon();
+	UPROPERTY(BlueprintReadWrite,Category="Weapon|Mesh")
 	TObjectPtr<AActor> WeaponMesh;
 
 protected:
