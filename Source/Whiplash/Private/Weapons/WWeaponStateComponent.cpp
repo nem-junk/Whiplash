@@ -30,7 +30,7 @@ void UWWeaponStateComponent::InitializeComponent()
 	if (IWComponentInterface* Provider = Cast<IWComponentInterface>(GetOwner()))
 	{
 		TagComponent = Provider->GetTagComponent();
-		if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TagComponentisNULLinWeaponInstance"));
+	//	if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TagComponentisNULLinWeaponInstance"));
 	}
 }
 void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,

@@ -48,7 +48,11 @@ void UWAbility_WeaponFire::StartAbility_Implementation(AActor* Instigator)
 	{
 		//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("in TC next will be to add State_Firing"));
 		TagComponent->AddTags(WhiplashTags::State_Firing);
-		FireOnce();
+		if (TagComponent->HasTag(WhiplashTags::State_ADS))
+		{
+			FireOnce();
+		}
+		
 		if (!CachedWeaponState) return;
 		if(CachedWeaponState->GetWeaponDA()->Ammunition.bIsAutomatic)
 		{
@@ -101,7 +105,7 @@ void UWAbility_WeaponFire::FireOnce()
 	}
 	// tu he tho sab thi, tu he tho sab hai 
 	// kab se mai tera ho kab se tu meri laila 
-	FVector AimTarget = GetAimTargetPoint();
+	const FVector AimTarget = GetAimTargetPoint();
 	USceneComponent* MuzzleRoot = CachedWeaponState->GetWeaponMeshRootComponent();
 	if (!MuzzleRoot)
 	{
@@ -123,19 +127,26 @@ void UWAbility_WeaponFire::FireOnce()
 	}
 	FTransform MuzzleTransform = SKM->GetSocketTransform(MuzzleSocketName);
 	//FVector MuzzleLocation = SKM->GetSocketLocation(MuzzleSocketName);
-	FVector MuzzleLocation = MuzzleTransform.GetLocation();
-	//FVector BaseDirection = (AimTarget - MuzzleLocation).GetSafeNormal();
-	FVector BaseDirection = MuzzleTransform.GetRotation().GetForwardVector();
+	FVector TraceStart = MuzzleTransform.GetLocation();
+	FVector BaseDirection = (AimTarget - TraceStart).GetSafeNormal();
+	if (BaseDirection.IsNearlyZero())
+	{
+		BaseDirection = OwnerPawn->GetControlRotation().Vector();
+	}
+	//FVector BaseDirection = MuzzleTransform.GetRotation().GetForwardVector();
 	FRotator SpreadRot = GetSpreadRotation();
 	FVector FinalDirection = SpreadRot.RotateVector(BaseDirection);
 	FHitResult HitResult;
-	FVector TraceEnd = MuzzleLocation + FinalDirection * WeaponDA->MaxDamageRange;
+	const bool bHasSpread = !SpreadRot.IsNearlyZero();
+	
+	//FVector TraceEnd = MuzzleLocation + FinalDirection * WeaponDA->MaxDamageRange;
+	FVector TraceEnd = bHasSpread ? TraceStart + FinalDirection*WeaponDA->MaxDamageRange : AimTarget;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(OwnerPawn);
 	if (WeaponDA->BulletTraceSweepRadius > 0)
 	{
 		GetWorld()->SweepSingleByChannel(HitResult,
-			MuzzleLocation,
+			TraceStart,
 			TraceEnd,
 			FQuat::Identity,
 			ECC_Visibility,
@@ -144,12 +155,12 @@ void UWAbility_WeaponFire::FireOnce()
 	else
 	{
 		GetWorld()->LineTraceSingleByChannel(HitResult,
-			MuzzleLocation,
+			TraceStart,
 			TraceEnd,
 			ECC_Visibility,Params);
 	}
-#if !UE_BUILD_SHIPPING
-	DrawDebugLine(GetWorld(),MuzzleLocation,
+/*#if !UE_BUILD_SHIPPING
+	DrawDebugLine(GetWorld(),TraceStart,
 		HitResult.bBlockingHit ? HitResult.ImpactPoint : TraceEnd,
 		HitResult.bBlockingHit ? FColor::Red : FColor::Green,
 		false,1.f,0,1.f);
@@ -157,7 +168,7 @@ void UWAbility_WeaponFire::FireOnce()
 	{
 		DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,5.f,8,FColor::Red,1.f);
 	}
-#endif
+#endif*/
 	if (APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController()))
 	{
 		float Pitch = WeaponDA->WeaponRecoil.RecoilPitch * FMath::RandRange(0.9f,1.f);

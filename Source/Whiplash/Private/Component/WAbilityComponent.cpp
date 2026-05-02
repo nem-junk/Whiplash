@@ -19,7 +19,11 @@ void UWAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	TagComponent = GetOwner()->FindComponentByClass<UWTagComponent>();
-	if (!TagComponent) WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
+	if (!TagComponent)
+	{
+		//WHIPLASH_LOG(LogWhiplashAbility,Error,TEXT("TagComp is null"));
+		return;
+	}
 	for (TSubclassOf<UWAbility> AbilityClass : DefaultAbilities)
 	{
 		AddAbility(GetOwner(), AbilityClass);

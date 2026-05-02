@@ -70,17 +70,19 @@ protected:
 	TSoftObjectPtr<UInputAction> JumpInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> CrouchInputActionTriggered;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category="Input|Action|Weapon")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> ShootInputActionTriggered;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Input|Action|FlashLight")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Input|Action")
 	TSoftObjectPtr<UInputAction> ToggleFlashLightInputAction;
-	  
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category= "Input|Action")
+	
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> PerspectiveInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> AimInputAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
+	TObjectPtr<UCurveFloat> WeaponWobbleCurve;
 	
 	bool bIsCrouching = false;
 	/* This function normalizes the input scale when the movement stick mode is set to fixed speed.

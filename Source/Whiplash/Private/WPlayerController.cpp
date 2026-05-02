@@ -56,8 +56,8 @@ void AWPlayerController::OnPossess(APawn* InPawn)
 	{
 		TagComponent = Provider->GetTagComponent();
 		AbilityComponent = Provider->GetAbilityComponent();
-		if (!AbilityComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("ABILITYCOMPisNULLinPlayerController"));
-		if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TAGCOMPisNULLinPlayerController"));
+		//if (!AbilityComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("ABILITYCOMPisNULLinPlayerController"));
+		//if (!TagComponent) WHIPLASH_LOG(LogWhiplash,Error,TEXT("TAGCOMPisNULLinPlayerController"));
 	}
 	WhiplashCharacter = Cast<AWCharacter>(InPawn);// on unPossess remove character 
 
@@ -335,6 +335,13 @@ void AWPlayerController::OnShootPressed()
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
 		ControlledPawn->GetAbilityComponent()->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Shoot);
+		if (ControlledPawn->GetWeaponState()->WeaponMesh)
+		{
+			if (WeaponWobbleCurve)
+			{
+				//FRotator RandomYaw = 
+			}
+		}
 	}
 }
 
