@@ -75,12 +75,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Input|Action")
 	TSoftObjectPtr<UInputAction> ToggleFlashLightInputAction;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category= "Input|Action")
-	
 	TSoftObjectPtr<UInputAction> StrafeInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> PerspectiveInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> AimInputAction;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
 	TObjectPtr<UCurveFloat> WeaponWobbleCurve;
 	

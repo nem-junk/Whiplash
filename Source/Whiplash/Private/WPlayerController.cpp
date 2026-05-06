@@ -37,6 +37,22 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,ShootInputActionTriggered,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,ToggleFlashLightInputAction,ETriggerEvent::Started);
 	
+	/*
+	if (SprintInputAction.IsNull())
+	{
+		WHIPLASH_LOG(LogWhiplash, Error, TEXT("input action property is null!"));
+	}
+	else
+	{
+		UInputAction* SprintAction = SprintInputAction.LoadSynchronous();
+
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AWPlayerController::OnSprintStarted);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AWPlayerController::OnSprintStopped);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AWPlayerController::OnSprintStopped);
+	}
+	*/
+
+	
 }
 
 void AWPlayerController::OnPossess(APawn* InPawn)
