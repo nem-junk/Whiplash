@@ -25,7 +25,7 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,MoveWorldSpaceInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,LookInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,LookGamepadInputAction,ETriggerEvent::Triggered);
-	REGISTER_INPUT_ACTION(EnhancedInputComponent,SprintInputAction,ETriggerEvent::Started);
+	//REGISTER_INPUT_ACTION(EnhancedInputComponent,SprintInputAction,ETriggerEvent::Started);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,WalkInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,JumpInputAction,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent, CrouchInputActionTriggered, ETriggerEvent::Started);
@@ -37,21 +37,13 @@ void AWPlayerController::SetupInputComponent()
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,ShootInputActionTriggered,ETriggerEvent::Triggered);
 	REGISTER_INPUT_ACTION(EnhancedInputComponent,ToggleFlashLightInputAction,ETriggerEvent::Started);
 	
-	/*
-	if (SprintInputAction.IsNull())
-	{
-		WHIPLASH_LOG(LogWhiplash, Error, TEXT("input action property is null!"));
-	}
-	else
+	// WITH:
+	if (!SprintInputAction.IsNull())
 	{
 		UInputAction* SprintAction = SprintInputAction.LoadSynchronous();
-
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AWPlayerController::OnSprintStarted);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AWPlayerController::OnSprintStopped);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AWPlayerController::OnSprintStopped);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AWPlayerController::OnSprintPressed);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AWPlayerController::OnSprintReleased);
 	}
-	*/
-
 	
 }
 
@@ -190,6 +182,24 @@ void AWPlayerController::OnSprintInputAction(const FInputActionInstance& Instanc
 	}
 }
 
+void AWPlayerController::OnSprintPressed(const FInputActionInstance& Instance)
+{
+	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	{
+		ControlledPawn->bWantsToSprint = true;
+		ControlledPawn->AttributeSet->StartStaminaDrain();
+	}
+}
+
+void AWPlayerController::OnSprintReleased(const FInputActionInstance& Instance)
+{
+	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
+	{
+		ControlledPawn->bWantsToSprint = false;
+		ControlledPawn->AttributeSet->StopStaminaDrain();
+	}
+}
+
 void AWPlayerController::OnWalkInputAction(const FInputActionInstance& Instance)
 {
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
@@ -276,7 +286,10 @@ void AWPlayerController::OnPerspectiveInputAction(const FInputActionInstance& In
 	
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
-		ControlledPawn->bWantsFirstPerson = !ControlledPawn->bWantsFirstPerson;
+		bIsLeftShoulder = !bIsLeftShoulder;
+		FVector CurrentOffSet = ControlledPawn->CameraStyleThirdPersonAim.SocketOffset;
+		CurrentOffSet.Y = FMath::Abs(CurrentOffSet.Y) * (bIsLeftShoulder ? -1.f : 1.f);
+		ControlledPawn->CameraStyleThirdPersonAim.SocketOffset = CurrentOffSet;
 	}
 }
 

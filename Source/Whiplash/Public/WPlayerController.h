@@ -80,7 +80,7 @@ protected:
 	TSoftObjectPtr<UInputAction> PerspectiveInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Input|Action")
 	TSoftObjectPtr<UInputAction> AimInputAction;
-	
+	bool bIsLeftShoulder = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
 	TObjectPtr<UCurveFloat> WeaponWobbleCurve;
 	
@@ -105,6 +105,10 @@ protected:
 	virtual void OnLookGamepadInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnSprintInputAction(const FInputActionInstance& Instance);
+	UFUNCTION()
+	void OnSprintPressed(const FInputActionInstance& Instance);
+	UFUNCTION()
+	void OnSprintReleased(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnWalkInputAction(const FInputActionInstance& Instance);
 	UFUNCTION()

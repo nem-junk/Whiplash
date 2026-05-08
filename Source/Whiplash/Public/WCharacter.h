@@ -203,7 +203,7 @@ public:
 	FCameraParameters CameraStyleThirdPersonClose;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Camera)
 	FCameraParameters CameraStyleThirdPersonAim;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")
 	FVector WalkSpeeds = FVector(200.0f,175.0f,150.0f);
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Movement")

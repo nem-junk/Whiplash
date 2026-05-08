@@ -8,7 +8,7 @@
 
 UWTraversalComponent::UWTraversalComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true; // change this to false later
+	PrimaryComponentTick.bCanEverTick = true; 
 
 }
 

@@ -88,6 +88,8 @@ public:
 	float ObstacleHeight = 0;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Traversal")
 	float ObstacleDepth = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bPistolEquipped = false;
 };
 
 UINTERFACE(Blueprintable)

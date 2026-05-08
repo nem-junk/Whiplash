@@ -114,7 +114,7 @@ void AWCharacter::BeginPlay()
 	Super::BeginPlay();
 	bWantsToWalk=true;
 	
-	
+	//CMC->AddTickPrerequisiteComponent(GetCharacterMovement());
 	MainHUDptr =  CreateWidget<UMainHUD>(GetWorld(),MainHUDClass);
 	check(MainHUDptr);
 	MainHUDptr->AddToViewport(1);
@@ -141,6 +141,7 @@ void AWCharacter::Tick(float DeltaTime)
 	UpdateMovement();
 	UpdateRotation();
 	UpdateCamera(true);
+
 
 }
 void AWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -169,6 +170,8 @@ void AWCharacter::OnStaminaChanged(float OldStamina,float NewStamina)
 
 void AWCharacter::OnOutOfStamina()
 {
+	bWantsToSprint = false;
+	AttributeSet->StopStaminaDrain();
 }
 
 void AWCharacter::ReceiveDamage(const FDamageEventStruct& DamageEvent)
@@ -479,6 +482,7 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	ChooserParameters.Speed = GetCharacterMovement()->Velocity.Size2D();
 	ChooserParameters.ObstacleHeight = TraversalCheckResult.ObstacleHeight;
 	ChooserParameters.ObstacleDepth = TraversalCheckResult.ObstacleDepth;
+	ChooserParameters.bPistolEquipped = TagComponent->HasTag(WhiplashTags::State_WeaponEquipped);
 
 	FChooserEvaluationContext Context = UChooserFunctionLibrary::MakeChooserEvaluationContext();
 	Context.AddStructParam(ChooserParameters);
@@ -486,12 +490,27 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	//EvaluateObjectChooserBaseMulti()->runs the chooser with the context given, returns all the montages in this case that pass the conditions as a TArray
 	TArray<UObject*> AnimationAssets = UChooserFunctionLibrary::EvaluateObjectChooserBaseMulti(Context,UChooserFunctionLibrary::MakeEvaluateChooser(TraversalAnimationChooserTable.LoadSynchronous()),
 		UAnimMontage::StaticClass());
+	WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("Chooser returned %d assets | bPistolEquipped: %s"), 
+	    AnimationAssets.Num(), ChooserParameters.bPistolEquipped ? TEXT("true") : TEXT("false"));
 
+	if (GEngine)
+	{
+	    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, 
+	        FString::Printf(TEXT("Chooser assets: %d | Pistol: %s"), 
+	        AnimationAssets.Num(), ChooserParameters.bPistolEquipped ? TEXT("true") : TEXT("false")));
+	}
 	/*perform a motion match on all the montages that were chosen by the chooser to find the best result. this match will elect the best montage and the best entry frame(start time ) bases on the distance to the ledge, and the current Characters pose. if for some reason no montage was found (motion matching failed, pherhaps due to an invalid database or isse with the schema ), print a warning and exit the function*/
 	static const FName PoseHistoryName  = TEXT("PoseHistory");
 	FPoseSearchBlueprintResult Result;
+	for (int32 i = 0; i < AnimationAssets.Num(); i++)
+	{
+		WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("Asset[%d]: %s (Valid: %s)"), 
+			i, *GetNameSafe(AnimationAssets[i]), IsValid(AnimationAssets[i]) ? TEXT("true") : TEXT("false"));
+	}
 	UPoseSearchLibrary:: MotionMatch(GetMesh()->GetAnimInstance(),AnimationAssets,
 		PoseHistoryName,FPoseSearchContinuingProperties(),FPoseSearchFutureProperties(),Result);
+	WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("MotionMatch result - SelectedAnim: %s, IsValid: %s"), 
+	*GetNameSafe(Result.SelectedAnim), IsValid(Result.SelectedAnim) ? TEXT("true") : TEXT("false"));
 	TObjectPtr<const UAnimMontage> AnimationMontage = Cast<UAnimMontage>(Result.SelectedAnim);
 	if (!IsValid(AnimationMontage))
 	{
@@ -502,6 +521,15 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 		return;
 	}
 	TraversalCheckResult.ChosenMontage = AnimationMontage;
+	WHIPLASH_LOG(LogWhiplashAbility, Warning, TEXT("Chooser picked montage: %s"), 
+	TraversalCheckResult.ChosenMontage ? *TraversalCheckResult.ChosenMontage->GetName() : TEXT("NULL"));
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, 
+			FString::Printf(TEXT("Chooser → %s"), TraversalCheckResult.ChosenMontage ? *TraversalCheckResult.ChosenMontage->GetName() : TEXT("NULL")));
+	}
+	
 	TraversalCheckResult.StartTime = Result.SelectedTime;
 	TraversalCheckResult.PlayRate = Result.WantedPlayRate;
 
