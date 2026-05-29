@@ -240,6 +240,24 @@ void AWCharacter::PlayAudioEvent_Implementation(const FGameplayTag& Value, float
 void AWCharacter::PlayAnimationMontage_Implementation(const UAnimMontage* Montage, float PlayRate,
 	float StartingPosition)
 {
+	if (!Montage || !GetMesh())
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+	{
+		return;
+	}
+
+	AnimInstance->Montage_Play(
+		const_cast<UAnimMontage*>(Montage),
+		PlayRate,
+		EMontagePlayReturnType::MontageLength,
+		StartingPosition,
+		true
+	);
 }
 //////////////////////////////////////////Traversal Block
 
@@ -482,8 +500,8 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	ChooserParameters.Speed = GetCharacterMovement()->Velocity.Size2D();
 	ChooserParameters.ObstacleHeight = TraversalCheckResult.ObstacleHeight;
 	ChooserParameters.ObstacleDepth = TraversalCheckResult.ObstacleDepth;
-	ChooserParameters.bPistolEquipped = TagComponent->HasTag(WhiplashTags::State_WeaponEquipped);
-
+	//ChooserParameters.bPistolEquipped = TagComponent->HasTag(WhiplashTags::State_WeaponEquipped);
+	
 	FChooserEvaluationContext Context = UChooserFunctionLibrary::MakeChooserEvaluationContext();
 	Context.AddStructParam(ChooserParameters);
 	//MakeEvaluateChooser()->wraps the chooser table in an evaluatable form
@@ -534,9 +552,12 @@ void AWCharacter::TryTraversalAction(float TraceForwardDistance, bool& bOutTrave
 	TraversalCheckResult.PlayRate = Result.WantedPlayRate;
 
 	TraversalResult = TraversalCheckResult;
+	bDoingTraversalAction = true;
+	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent, true);
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	UpdateWrapTargets();
 	PlayAnimationMontage(TraversalResult.ChosenMontage,TraversalResult.PlayRate,TraversalResult.StartTime);
-	bDoingTraversalAction = true;
+	
 	GetCapsuleComponent()->IgnoreComponentWhenMoving(TraversalResult.HitComponent,true);
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 
