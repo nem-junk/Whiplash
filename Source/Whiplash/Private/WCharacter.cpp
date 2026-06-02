@@ -163,7 +163,7 @@ void AWCharacter::OnHealthChanged(float OldHealth, float NewHealth )
 {
 }
 
-void AWCharacter::OnStaminaChanged(float OldStamina,float NewStamina)
+void AWCharacter::OnStaminaChanged(float OldStamina,float NewStamina) const
 {
 	if (MainHUDptr&&MainHUDptr->StaminaWidget)MainHUDptr->StaminaWidget->UpdateStaminaBar(AttributeSet->GetStamina(),AttributeSet->GetMaxStamina());
 }

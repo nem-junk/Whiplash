@@ -41,7 +41,48 @@ void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	const bool bMinSpread=IsSpreadAtMinimum(DeltaTime);
 	const bool bMinMultipliers=AreMultipliersAtMinimum(DeltaTime);
 	bApplyFirstShotAccuracy= WeaponProperties->bHasFirstShotAccuracy and bMinMultipliers and bMinSpread;
-	
+#if !UE_BUILD_SHIPPING
+	if (GEngine && WeaponProperties)
+	{
+		const float SpreadAngle = GetSpreadAngle();
+		const float PublicMultiplier = GetSpreadAngleMultiplier();
+		const float RawMultiplier = AccumulatedSpreadAngleMultiplier;
+		const float FinalSpread = SpreadAngle * PublicMultiplier;
+		const float RawFinalSpread = SpreadAngle * RawMultiplier;
+
+		const FString SpreadMessage = FString::Printf(
+			TEXT("SPREAD | Angle: %.3f | PublicMult: %.3f | RawMult: %.3f | Final: %.3f | RawFinal: %.3f | FirstShotAcc: %s"),
+			SpreadAngle,
+			PublicMultiplier,
+			RawMultiplier,
+			FinalSpread,
+			RawFinalSpread,
+			bApplyFirstShotAccuracy ? TEXT("true") : TEXT("false")
+		);
+
+		GEngine->AddOnScreenDebugMessage(
+			101,
+			0.f,
+			FColor::Orange,
+			SpreadMessage,
+			true,
+			FVector2D(2.f, 2.f)
+		);
+
+		DebugSpreadLogTimer += DeltaTime;
+		if (DebugSpreadLogTimer >= 0.25f)
+		{
+			DebugSpreadLogTimer = 0.f;
+
+			WHIPLASH_LOG(
+				LogWhiplashAbility,
+				Warning,
+				TEXT("%s"),
+				*SpreadMessage
+			);
+		}
+	}
+#endif
 }
 
 void UWWeaponStateComponent::BeginPlay()
@@ -62,6 +103,7 @@ void UWWeaponStateComponent::Fire()
 	AccumulatedSpreadAngle += WeaponProperties->WeaponHandling.SpreadAngleAccumulationPerShot;
 	CurrentMagazineAmmo = FMath::Max(0,CurrentMagazineAmmo-1);
 	bHas1InTheChamber = CurrentMagazineAmmo>0;
+
 }
 
 bool UWWeaponStateComponent::CanFire() const
@@ -222,6 +264,36 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 	const float CombinedMultiplier = CurrentMultiplier_ADS*CurrentMultiplier_StandingStill*CurrentMultiplier_Crouching*CurrentMultiplier_Falling;
 	
 	AccumulatedSpreadAngleMultiplier = CombinedMultiplier;
+#if !UE_BUILD_SHIPPING
+	if (GEngine && WeaponProperties)
+	{
+		const FString MultMessage = FString::Printf(
+			TEXT("MULT | CMC Crouch: %s | CrouchTarget: %.3f | CrouchMult: %.3f | ADS: %.3f | Move: %.3f | Fall: %.3f | Combined: %.3f"),
+			bIsCrouching ? TEXT("true") : TEXT("false"),
+			CrouchingTargetValue,
+			CurrentMultiplier_Crouching,
+			CurrentMultiplier_ADS,
+			CurrentMultiplier_StandingStill,
+			CurrentMultiplier_Falling,
+			CombinedMultiplier
+		);
+
+		GEngine->AddOnScreenDebugMessage(
+			102,
+			0.f,
+			FColor::Cyan,
+			MultMessage,
+			true,
+			FVector2D(2.f, 2.f)
+		);
+		WHIPLASH_LOG(
+            LogWhiplashAbility,
+            Warning,
+            TEXT("%s"),
+            *MultMessage
+        );
+	}
+#endif
 	// need to handle these spread multipliers indicating we are not at min spread ?????????????????
 	return bStandingStillMultiplierAtMin and bCrouchingMultiplierAtTarget and bInAirMultiplierIs1 and bAimingMultiplierAtTarget;
 }

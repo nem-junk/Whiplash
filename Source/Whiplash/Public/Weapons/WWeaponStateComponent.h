@@ -71,7 +71,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-
+	float DebugSpreadLogTimer = 0.f;
 	TObjectPtr<APawn> OwnerPawn;
 	TObjectPtr<UCharacterMovementComponent> CMC;
 	TObjectPtr<UWTagComponent> TagComponent; // tag comp from character class;

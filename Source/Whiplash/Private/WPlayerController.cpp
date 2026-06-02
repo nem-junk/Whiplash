@@ -312,7 +312,7 @@ void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 			ControlledPawn->bWantsToStrafe = true;
 			if (ControlledPawn->CMC)
 			{
-				//ControlledPawn->CMC->RotationRate = FRotator(0.f,720.f,0.f);
+				
 			}
 		}
 		else if(!ControlledPawn->bWantsToAim)
@@ -321,7 +321,7 @@ void AWPlayerController::OnAimInputAction(const FInputActionInstance& Instance)
 			ControlledPawn->bWantsToStrafe = bSavedWantsToStrafe;
 			if (ControlledPawn->CMC)
 			{
-				//ControlledPawn->CMC->RotationRate = FRotator(0.f,360.f,0.f);
+				
 			}
 		}
 	}
@@ -359,25 +359,33 @@ void AWPlayerController::OnToggleFlashLightInputAction(const FInputActionInstanc
 	
 }
 
-void AWPlayerController::OnShootPressed()
+void AWPlayerController::OnShootPressed() const
 {
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
 		ControlledPawn->GetAbilityComponent()->StartAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Shoot);
-		if (ControlledPawn->GetWeaponState()->WeaponMesh)
-		{
-			if (WeaponWobbleCurve)
-			{
-				//FRotator RandomYaw = 
-			}
-		}
+		
 	}
 }
 
-void AWPlayerController::OnShootReleased()
+void AWPlayerController::OnShootReleased() const
 {
 	if (AWCharacter* ControlledPawn = GetWhiplashCharacter())
 	{
 		ControlledPawn->GetAbilityComponent()->StopAbilityByTag(ControlledPawn,WhiplashTags::Ability_Action_Shoot);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

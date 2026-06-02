@@ -230,7 +230,7 @@ public:
 private:
 	void OnOutOfHealth();
 	void OnHealthChanged(float OldHealth, float NewHealth );
-	void OnStaminaChanged(float OldStamina,float NewStamina);
+	void OnStaminaChanged(float OldStamina,float NewStamina) const;
 	void OnOutOfStamina();
 	
 	void ReceiveDamage(const FDamageEventStruct& DamageEvent);

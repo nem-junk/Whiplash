@@ -26,10 +26,9 @@ void UWAbility::StartAbility_Implementation(AActor* Instigator)
 	UWAbilityComponent* AbilityComp = GetOwningComponent();
 	if (AbilityComp)
 	{
-		OwnerPawn = Cast<APawn>(AbilityComp->GetOwner());	// find a way to not have a cast here ;
+		OwnerPawn = Cast<APawn>(AbilityComp->GetOwner());	
 	
 	}
-	
 	
 	if (TagComponent)
 	{

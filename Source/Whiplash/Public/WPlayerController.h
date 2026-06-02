@@ -128,8 +128,8 @@ protected:
 	virtual void OnShootInputActionTriggered(const FInputActionInstance& Instance);
 	UFUNCTION()
 	virtual void OnToggleFlashLightInputAction(const FInputActionInstance& Instance);
-	void OnShootPressed();
-	void OnShootReleased();
+	void OnShootPressed() const ;
+	void OnShootReleased() const ;
 	
 	bool bSavedWantsToStrafe = false;
 public:
