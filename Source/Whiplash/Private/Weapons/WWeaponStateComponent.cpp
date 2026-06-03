@@ -41,7 +41,7 @@ void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	const bool bMinSpread=IsSpreadAtMinimum(DeltaTime);
 	const bool bMinMultipliers=AreMultipliersAtMinimum(DeltaTime);
 	bApplyFirstShotAccuracy= WeaponProperties->bHasFirstShotAccuracy and bMinMultipliers and bMinSpread;
-#if !UE_BUILD_SHIPPING
+/*#if !UE_BUILD_SHIPPING
 	if (GEngine && WeaponProperties)
 	{
 		const float SpreadAngle = GetSpreadAngle();
@@ -82,7 +82,7 @@ void UWWeaponStateComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			);
 		}
 	}
-#endif
+#endif*/
 }
 
 void UWWeaponStateComponent::BeginPlay()
@@ -264,7 +264,7 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
 	const float CombinedMultiplier = CurrentMultiplier_ADS*CurrentMultiplier_StandingStill*CurrentMultiplier_Crouching*CurrentMultiplier_Falling;
 	
 	AccumulatedSpreadAngleMultiplier = CombinedMultiplier;
-#if !UE_BUILD_SHIPPING
+/*#if !UE_BUILD_SHIPPING
 	if (GEngine && WeaponProperties)
 	{
 		const FString MultMessage = FString::Printf(
@@ -293,7 +293,7 @@ bool UWWeaponStateComponent::AreMultipliersAtMinimum(float DeltaTime)
             *MultMessage
         );
 	}
-#endif
+#endif*/
 	// need to handle these spread multipliers indicating we are not at min spread ?????????????????
 	return bStandingStillMultiplierAtMin and bCrouchingMultiplierAtTarget and bInAirMultiplierIs1 and bAimingMultiplierAtTarget;
 }
